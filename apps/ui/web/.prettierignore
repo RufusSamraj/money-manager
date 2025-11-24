@@ -1,7 +1,0 @@
-node_modules
-dist
-build
-.env
-routeTree.gen.ts
-pnpm-lock.yaml
-pnpm-workspace.yaml
