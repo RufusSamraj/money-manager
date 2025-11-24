@@ -1,5 +1,7 @@
 import { useState } from "react";
+
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+
 import "../../index.css";
 
 const dataIncome = [
@@ -78,18 +80,13 @@ export default function StatsTabs() {
               className="flex items-center justify-between p-4 border rounded-xl shadow-sm"
             >
               <div className="flex items-center gap-3">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                ></div>
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }}></div>
                 <span className="text-lg font-medium">{item.name}</span>
               </div>
 
               <div className="text-right">
                 <p className="text-lg font-semibold">₹{item.value}</p>
-                <p className="text-sm text-gray-500">
-                  {((item.value / total) * 100).toFixed(1)}%
-                </p>
+                <p className="text-sm text-gray-500">{((item.value / total) * 100).toFixed(1)}%</p>
               </div>
             </div>
           ))}
