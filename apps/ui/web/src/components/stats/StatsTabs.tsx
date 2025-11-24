@@ -17,7 +17,7 @@ export default function StatsTabs({ data }: Props) {
 
   const chartData = selectedData.map((item) => ({
     name: item.name,
-    value: item.amount, // recharts expects `value`
+    value: item.amount,
     color: item.color,
   }));
 

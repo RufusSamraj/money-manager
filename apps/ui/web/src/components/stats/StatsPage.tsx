@@ -17,10 +17,8 @@ export default function StatsPage() {
     <div className="p-6 flex flex-col gap-8">
       <h1 className="text-2xl font-semibold">Statistics</h1>
 
-      {/* Timeline Filter */}
       <ReportTimeline onChange={setTimeline} />
 
-      {/* Pass data to StatsTabs */}
       {data && <StatsTabs data={data} />}
     </div>
   );
