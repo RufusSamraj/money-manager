@@ -1,13 +1,19 @@
-import { useState } from 'react'
-import './App.css'
+import { Routes, Route } from "react-router-dom";
+import TopNavBar from "./components/navbar";
+import StatsPage from "./components/stats";
 
 function App() {
-
   return (
     <>
-      <div className="text-3xl font-bold text-red-500">Hello</div>
+      <TopNavBar />
+      
+      <div className="pt-16"> 
+        <Routes>
+          <Route path="/stats" element={<StatsPage />} />
+        </Routes>
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

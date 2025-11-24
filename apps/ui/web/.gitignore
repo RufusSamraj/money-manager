@@ -1,3 +1,15 @@
+# Backend
+migrations/
+uploads/
+
+# Tanstack
+count.txt
+.nitro
+.tanstack
+.output
+.vinxi
+todos.json
+
 # Logs
 logs
 *.log
@@ -22,3 +34,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+web-tanstack
