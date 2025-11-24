@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
 import TopNavBar from "./components/navbar";
-import StatsPage from "./components/stats";
+import StatsPage from "./components/stats/StatsPage";
 
 function App() {
   return (
