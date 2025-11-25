@@ -1,7 +1,7 @@
 import BudgetView from "./BudgetView/BudgetView";
 import StatsView from "./StatsView";
 import { mockBudgetResponse } from "./mock/budgetMock";
-import { mockStatsResponse } from "./mock/stats";
+// import { mockStatsResponse } from "./mock/stats";
 import { useState } from "react";
 
 export default function StatsTab() {
@@ -25,7 +25,7 @@ export default function StatsTab() {
         </button>
       </div>
 
-      {tab === "stats" && <StatsView data={mockStatsResponse} />}
+      {/* {tab === "stats" && <StatsView data={mockStatsResponse} />} */}
       {tab === "budget" && <BudgetView data={mockBudgetResponse} />}
     </div>
   );

@@ -1,18 +1,22 @@
 import { Routes, Route } from "react-router";
 
 import TopNavBar from "./components/navbar";
-import StatsPage from "./components/stats/StatsPage";
+import StatsPage from "./components/stats/index";
+import Model from "./Model"
+import { Sidebar } from "./components/sidebar";
 
 function App() {
   return (
     <>
-      <TopNavBar />
+      {/* <TopNavBar /> */}
+      {/* <Sidebar /> */}
 
-      <div className="pt-16">
+      {/* <div className="pt-16"> */}
         <Routes>
-          <Route path="/stats" element={<StatsPage />} />
+          {/* <Route path="/stats" element={<StatsPage />} /> */}
+          <Route path="/model" element={<Model />} />
         </Routes>
-      </div>
+      {/* </div> */}
     </>
   );
 }
