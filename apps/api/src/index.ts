@@ -18,7 +18,7 @@ app.use(express.json());
 
 // Database Connection (Ensure you have a .env file with DATABASE_URL)
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgres://postgres:postgree@localhost:5432/moneymanager',
+  connectionString: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/moneymanager?sslmode=disable',
 });
 const db = drizzle(pool, { schema });
 // const db = drizzle({ client: pool });
