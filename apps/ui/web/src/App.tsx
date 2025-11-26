@@ -14,7 +14,7 @@ function App() {
       {/* <div className="pt-16"> */}
         <Routes>
           {/* <Route path="/stats" element={<StatsPage />} /> */}
-          <Route path="/model" element={<Model />} />
+          <Route path="/" element={<Model />} />
         </Routes>
       {/* </div> */}
     </>

@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Search, Star, SlidersHorizontal, ChevronLeft, ChevronRight, 
   LayoutDashboard, PieChart, CreditCard, Settings, Plus, Wallet, 
-  Edit2, Filter, X, Check, Loader2, Trash2
+  Edit2, Filter, X, Check
 } from 'lucide-react';
 
 /**
- * MONEY MANAGER APP - DYNAMIC VERSION
+ * MONEY MANAGER APP - WEB DASHBOARD (Tailwind Version)
  * * Features:
- * - Connects to Node/Express/Drizzle Backend
- * - Dynamic Data Fetching
- * - Optimistic UI updates
+ * - Professional Sidebar Layout
+ * - Polished UI/UX mimicking high-end component libraries
+ * - Interactive Modals & Inputs
+ * - "Segmented Control" style tabs
+ * - Pure Frontend with Mock Data
  */
 
-// --- Constants ---
-
-const API_URL = 'http://localhost:3000/api';
+// --- Constants & Mock Data ---
 
 const COLORS = {
   expense: '#ff5252',
@@ -32,15 +32,34 @@ const COLORS = {
   }
 };
 
-// Fallback data for preview only (if backend isn't running)
-const FALLBACK_TRANSACTIONS = [
-  { id: 1, type: 'expense', date: '2025-07-29', category: 'Food', account: 'Cash', note: 'Backend Not Connected', amount: 0.00 },
+const INITIAL_TRANSACTIONS = [
+  { id: 1, type: 'expense', date: '2025-07-29', category: 'Food', account: 'Cash', note: 'Brunch with Daniel', amount: 34.39 },
+  { id: 2, type: 'expense', date: '2025-07-28', category: 'Shopping', account: 'Credit Card', note: 'IKEA Wardrobe', amount: 315.48 },
+  { id: 3, type: 'transfer', date: '2025-07-27', category: 'Transfer', account: 'Bank', toAccount: 'Travel Fund', note: 'Minimum fees', amount: 80.00 },
+  { id: 4, type: 'expense', date: '2025-07-24', category: 'Housing', account: 'Bank', note: 'Rent', amount: 1200.00 },
+  { id: 5, type: 'income', date: '2025-07-22', category: 'Salary', account: 'Bank', note: 'July Salary', amount: 4500.00 },
+  { id: 6, type: 'expense', date: '2025-07-22', category: 'Transportation', account: 'Debit Card', note: 'Gas', amount: 45.00 },
+  { id: 7, type: 'expense', date: '2025-07-20', category: 'Entertainment', account: 'Cash', note: 'Movies', amount: 25.00 },
+  { id: 8, type: 'expense', date: '2025-07-20', category: 'Food', account: 'Cash', note: 'Groceries', amount: 124.50 },
 ];
 
-const FALLBACK_ACCOUNTS = [
-    { title: 'Cash', items: [{ name: 'Cash', amount: 0, type: 'asset' }] },
-    { title: 'Accounts', items: [{ name: 'Bank', amount: 0, type: 'asset' }] },
-    { title: 'Cards', items: [{ name: 'Credit Card', amount: 0, type: 'liability' }] }
+const ACCOUNTS_DATA = {
+  assets: 6628.12,
+  liabilities: 2082.42,
+  total: 4545.70,
+  groups: [
+    { title: 'Cash', items: [{ name: 'Cash', amount: 68.45 }] },
+    { title: 'Accounts', items: [{ name: 'Bank Main', amount: 2768.66 }, { name: 'Savings', amount: 1613.61 }] },
+    { title: 'Cards', items: [{ name: 'Credit Card', amount: -1076.39, type: 'liability' }] }
+  ]
+};
+
+const CATEGORY_STATS = [
+  { name: 'Food', amount: 250.00, budget: 300, color: COLORS.categoryColors.Food },
+  { name: 'Shopping', amount: 465.48, budget: 400, color: COLORS.categoryColors.Shopping },
+  { name: 'Housing', amount: 1200.00, budget: 1200, color: COLORS.categoryColors.Housing },
+  { name: 'Transp.', amount: 45.00, budget: 100, color: COLORS.categoryColors.Transportation },
+  { name: 'Entert.', amount: 25.00, budget: 50, color: COLORS.categoryColors.Entertainment },
 ];
 
 // --- Helper Components ---
@@ -77,36 +96,31 @@ const Badge = ({ children, color = 'gray' }) => {
 
 // --- Views ---
 
-const TransactionsView = ({ transactions, onDelete, isLoading }) => {
+const TransactionsView = ({ transactions }) => {
   const [subTab, setSubTab] = useState('Daily');
   
   const groupedTransactions = useMemo(() => {
     const grouped = {};
     transactions.forEach(t => {
-      // Ensure date is string YYYY-MM-DD
-      const dateStr = typeof t.date === 'string' ? t.date.substring(0, 10) : new Date(t.date).toISOString().split('T')[0];
+      const dateStr = t.date;
       if (!grouped[dateStr]) grouped[dateStr] = [];
       grouped[dateStr].push(t);
     });
     return Object.entries(grouped).sort((a, b) => new Date(b[0]) - new Date(a[0]));
   }, [transactions]);
 
-  const monthlyIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0);
-  const monthlyExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0);
+  const monthlyIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const monthlyExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
   const monthlyTotal = monthlyIncome - monthlyExpense;
 
   const DateGroup = ({ date, items }) => {
     const dateObj = new Date(date);
-    // Fix for timezone offset issues in simple date parsing
-    const userTimezoneOffset = dateObj.getTimezoneOffset() * 60000;
-    const adjustedDate = new Date(dateObj.getTime() + userTimezoneOffset);
-    
-    const day = adjustedDate.getDate();
-    const dayName = adjustedDate.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
-    const formattedDate = adjustedDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit' });
+    const day = dateObj.getDate();
+    const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+    const formattedDate = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit' });
 
-    const dailyIncome = items.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0);
-    const dailyExpense = items.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0);
+    const dailyIncome = items.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    const dailyExpense = items.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
     return (
       <Card noPadding className="mb-4">
@@ -128,7 +142,7 @@ const TransactionsView = ({ transactions, onDelete, isLoading }) => {
           {items.map((t, idx) => (
             <div 
               key={t.id} 
-              className={`group flex justify-between items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer ${idx !== items.length - 1 ? 'border-b border-gray-100' : ''}`}
+              className={`flex justify-between items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer ${idx !== items.length - 1 ? 'border-b border-gray-100' : ''}`}
             >
               <div className="flex items-center gap-4 overflow-hidden">
                  <span className="text-sm text-gray-400 w-16 shrink-0">{t.category}</span>
@@ -139,15 +153,7 @@ const TransactionsView = ({ transactions, onDelete, isLoading }) => {
                    </span>
                  </div>
               </div>
-              <div className="flex items-center gap-3">
-                <MoneyText amount={t.amount} type={t.type} className="text-sm" />
-                <button 
-                  onClick={(e) => { e.stopPropagation(); onDelete(t.id); }}
-                  className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
+              <MoneyText amount={t.amount} type={t.type} className="text-sm" />
             </div>
           ))}
         </div>
@@ -155,11 +161,43 @@ const TransactionsView = ({ transactions, onDelete, isLoading }) => {
     );
   };
 
-  const CalendarGrid = () => (
-    <div className="flex items-center justify-center h-full text-gray-400 text-sm bg-white rounded-xl border border-dashed border-gray-300">
-      Calendar View (Dynamic Implementation Pending)
-    </div>
-  );
+  const CalendarGrid = () => {
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    const startDayOffset = 2;
+
+    return (
+      <Card className="h-full flex flex-col" noPadding>
+        <div className="grid grid-cols-7 text-center bg-gray-50 border-b border-gray-200">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+            <div key={d} className="py-2 text-xs font-semibold text-gray-400">{d}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 bg-gray-200 gap-px flex-1">
+          {Array.from({ length: startDayOffset }).map((_, i) => <div key={`empty-${i}`} className="bg-white min-h-[80px]" />)}
+          {days.map(day => {
+            const hasData = [20, 22, 24, 28, 29].includes(day);
+            const isToday = day === 29;
+            return (
+              <div 
+                key={day} 
+                className={`bg-white min-h-[80px] p-2 flex flex-col justify-between hover:bg-blue-50 cursor-pointer relative ${isToday ? 'bg-blue-50/50' : ''}`}
+              >
+                <span className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${isToday ? 'bg-blue-500 text-white' : 'text-gray-500'}`}>
+                  {day}
+                </span>
+                {hasData && (
+                  <div className="flex flex-col items-end gap-0.5">
+                    <span className="text-[10px] text-blue-500 font-medium">450</span>
+                    <span className="text-[10px] text-red-500 font-medium">120</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+    );
+  };
 
   return (
     <div className="flex flex-col h-full gap-4">
@@ -214,64 +252,30 @@ const TransactionsView = ({ transactions, onDelete, isLoading }) => {
 
       {/* Content Area */}
       <div className="flex-1 overflow-y-auto pr-1">
-        {isLoading ? (
-            <div className="flex justify-center items-center h-40">
-                <Loader2 className="animate-spin text-gray-400" />
-            </div>
-        ) : subTab === 'Daily' ? (
-          groupedTransactions.length > 0 ? (
-            groupedTransactions.map(([date, items]) => (
-                <DateGroup key={date} date={date} items={items} />
-            ))
-          ) : (
-            <div className="text-center text-gray-400 mt-10">No transactions found</div>
-          )
+        {subTab === 'Daily' ? (
+          groupedTransactions.map(([date, items]) => (
+            <DateGroup key={date} date={date} items={items} />
+          ))
+        ) : subTab === 'Calendar' ? (
+          <CalendarGrid />
         ) : (
-             <CalendarGrid />
+          <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+            Not implemented in this demo
+          </div>
         )}
       </div>
     </div>
   );
 };
 
-const StatsView = ({ transactions }) => {
+const StatsView = () => {
   const [mode, setMode] = useState('Stats');
   
-  // Dynamic Calculation
-  const categoryTotals = useMemo(() => {
-    const totals = {};
-    let totalAmount = 0;
-    
-    // Initialize mock budgets (since we don't have a budget table yet)
-    Object.keys(COLORS.categoryColors).forEach(cat => {
-        totals[cat] = { amount: 0, budget: 500, color: COLORS.categoryColors[cat] };
-    });
-
-    transactions.forEach(t => {
-        if (t.type === 'expense') {
-            const cat = t.category;
-            const amt = Number(t.amount);
-            if (!totals[cat]) totals[cat] = { amount: 0, budget: 500, color: '#ccc' }; // fallback
-            totals[cat].amount += amt;
-            totalAmount += amt;
-        }
-    });
-
-    // Convert to array and filter out zero amounts for pie chart
-    return {
-        data: Object.entries(totals)
-            .map(([name, val]) => ({ name, ...val }))
-            .filter(item => item.amount > 0)
-            .sort((a, b) => b.amount - a.amount),
-        total: totalAmount
-    };
-  }, [transactions]);
-  
-  const { data: statsData, total } = categoryTotals;
-  
+  const total = CATEGORY_STATS.reduce((acc, curr) => acc + curr.amount, 0);
   let accumulatedAngle = 0;
-  const slices = statsData.map((cat) => {
-    const percentage = cat.amount / (total || 1);
+
+  const slices = CATEGORY_STATS.map((cat) => {
+    const percentage = cat.amount / total;
     const angle = percentage * 360;
     const x1 = 50 + 50 * Math.cos(Math.PI * (accumulatedAngle - 90) / 180);
     const y1 = 50 + 50 * Math.sin(Math.PI * (accumulatedAngle - 90) / 180);
@@ -311,9 +315,9 @@ const StatsView = ({ transactions }) => {
           <Card className="md:col-span-5 flex items-center justify-center p-8">
              <div className="relative w-56 h-56">
                 <svg viewBox="0 0 100 100" className="w-full h-full transform hover:scale-105 transition-transform duration-300">
-                  {slices.length > 0 ? slices.map((slice, i) => (
+                  {slices.map((slice, i) => (
                     <path key={i} d={slice.pathData} fill={slice.color} stroke="#fff" strokeWidth="1" />
-                  )) : <circle cx="50" cy="50" r="50" fill="#eee" />}
+                  ))}
                   <circle cx="50" cy="50" r="15" fill="white" />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -323,7 +327,7 @@ const StatsView = ({ transactions }) => {
           </Card>
           
           <Card className="md:col-span-7" noPadding>
-             {statsData.map((cat, i) => {
+             {CATEGORY_STATS.map((cat, i) => {
                 const pct = ((cat.amount / total) * 100).toFixed(1);
                 return (
                   <div key={cat.name} className="flex justify-between items-center p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
@@ -337,7 +341,6 @@ const StatsView = ({ transactions }) => {
                   </div>
                 );
              })}
-             {statsData.length === 0 && <div className="p-4 text-center text-gray-400">No data for this period</div>}
           </Card>
         </div>
       )}
@@ -347,10 +350,7 @@ const StatsView = ({ transactions }) => {
            <div className="flex justify-between items-end mb-8">
              <div>
                <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Remaining (Monthly)</span>
-               <div className="text-3xl font-bold text-gray-900 leading-tight mt-1">
-                   {/* Mock budget total logic */}
-                   - $ {(total - 1000).toFixed(2)}
-               </div>
+               <div className="text-3xl font-bold text-gray-900 leading-tight mt-1">- $ 26.00</div>
              </div>
              <button className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-xs font-medium text-gray-600 flex items-center gap-1 transition-colors">
                Budget Setting <ChevronRight size={12}/>
@@ -358,7 +358,7 @@ const StatsView = ({ transactions }) => {
            </div>
 
            <div className="space-y-6">
-             {statsData.map((cat) => {
+             {CATEGORY_STATS.map((cat) => {
                const percent = Math.min((cat.amount / cat.budget) * 100, 100);
                const isOver = cat.amount > cat.budget;
                
@@ -390,40 +390,7 @@ const StatsView = ({ transactions }) => {
   );
 };
 
-const AccountsView = ({ transactions }) => {
-  // Dynamically calculate accounts based on transactions
-  // Note: In a real app, this would be a separate API call to /api/accounts which returns pre-calculated balances
-  const accountsData = useMemo(() => {
-    // Clone base structure
-    const data = JSON.parse(JSON.stringify(FALLBACK_ACCOUNTS));
-    
-    // Very simple aggregation for demo purposes (assuming all start at 0)
-    const balances = {}; 
-    
-    transactions.forEach(t => {
-        if (!balances[t.account]) balances[t.account] = 0;
-        if (t.type === 'income') balances[t.account] += Number(t.amount);
-        else if (t.type === 'expense') balances[t.account] -= Number(t.amount);
-    });
-
-    // Update the groups with calculated balances
-    let assets = 0;
-    let liabilities = 0;
-
-    data.forEach(group => {
-        group.items.forEach(item => {
-            if (balances[item.name] !== undefined) {
-                // For demo, we just replace the amount. Real app would add to initial balance.
-                item.amount = balances[item.name]; 
-            }
-            if (item.type === 'liability' || item.amount < 0) liabilities += item.amount;
-            else assets += item.amount;
-        });
-    });
-
-    return { groups: data, assets, liabilities, total: assets + liabilities };
-  }, [transactions]);
-
+const AccountsView = () => {
   return (
     <div className="flex flex-col h-full gap-4">
       <div className="flex justify-between items-center">
@@ -442,21 +409,21 @@ const AccountsView = ({ transactions }) => {
         <div className="grid grid-cols-3 divide-x divide-gray-100">
            <div className="flex flex-col items-center gap-1">
              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Assets</span>
-             <span className="text-xl font-bold text-blue-500">$ {accountsData.assets.toFixed(2)}</span>
+             <span className="text-xl font-bold text-blue-500">$ {ACCOUNTS_DATA.assets.toFixed(2)}</span>
            </div>
            <div className="flex flex-col items-center gap-1">
              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Liabilities</span>
-             <span className="text-xl font-bold text-red-500">$ {Math.abs(accountsData.liabilities).toFixed(2)}</span>
+             <span className="text-xl font-bold text-red-500">$ {ACCOUNTS_DATA.liabilities.toFixed(2)}</span>
            </div>
            <div className="flex flex-col items-center gap-1">
              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Total</span>
-             <span className="text-xl font-bold text-gray-800">$ {accountsData.total.toFixed(2)}</span>
+             <span className="text-xl font-bold text-gray-800">$ {ACCOUNTS_DATA.total.toFixed(2)}</span>
            </div>
         </div>
       </Card>
 
       <div className="flex flex-col gap-4 overflow-y-auto">
-        {accountsData.groups.map(group => (
+        {ACCOUNTS_DATA.groups.map(group => (
           <Card key={group.title} noPadding>
              <div className="bg-gray-50 px-4 py-2 border-b border-gray-100">
                <span className="text-xs font-bold text-gray-400 uppercase">{group.title}</span>
@@ -464,7 +431,7 @@ const AccountsView = ({ transactions }) => {
              {group.items.map((item, idx) => (
                <div key={idx} className="flex justify-between items-center px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
                   <span className="text-sm font-medium text-gray-700">{item.name}</span>
-                  <span className={`text-sm font-semibold ${item.amount < 0 || item.type === 'liability' ? 'text-red-500' : 'text-blue-500'}`}>
+                  <span className={`text-sm font-semibold ${item.type === 'liability' ? 'text-red-500' : 'text-blue-500'}`}>
                     $ {Math.abs(item.amount).toFixed(2)}
                   </span>
                </div>
@@ -487,37 +454,8 @@ const AddTransactionModal = ({ isOpen, onClose, onAdd }) => {
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [category, setCategory] = useState('Food');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
-
-  const handleSubmit = async () => {
-      if (!amount) return;
-      setIsSubmitting(true);
-      
-      const newTx = {
-          type,
-          amount: parseFloat(amount),
-          category,
-          account: 'Cash', // hardcoded for demo
-          note,
-          date: new Date().toISOString().split('T')[0]
-      };
-
-      try {
-          // Optimistically call onAdd or fetch
-          await onAdd(newTx);
-          onClose();
-          // Reset form
-          setAmount('');
-          setNote('');
-          setCategory('Food');
-      } catch (e) {
-          alert("Failed to add transaction");
-      } finally {
-          setIsSubmitting(false);
-      }
-  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -556,7 +494,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAdd }) => {
                <label className="text-xs font-semibold text-gray-500">Date</label>
                <input 
                  type="date" 
-                 defaultValue={new Date().toISOString().split('T')[0]}
+                 defaultValue="2025-07-29"
                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all" 
                />
              </div>
@@ -564,7 +502,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAdd }) => {
                <label className="text-xs font-semibold text-gray-500">Time</label>
                <input 
                  type="text" 
-                 defaultValue="12:00 PM"
+                 defaultValue="12:50 PM"
                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all" 
                />
              </div>
@@ -636,11 +574,21 @@ const AddTransactionModal = ({ isOpen, onClose, onAdd }) => {
 
         <div className="p-4 border-t border-gray-100 bg-gray-50">
            <button 
-             onClick={handleSubmit}
-             disabled={isSubmitting}
-             className="w-full py-2.5 bg-gray-900 hover:bg-black text-white rounded-lg font-medium shadow-lg transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100 flex items-center justify-center gap-2"
+             onClick={() => {
+                if (!amount) return;
+                onAdd({
+                  id: Date.now(),
+                  type,
+                  amount: parseFloat(amount),
+                  category,
+                  account: 'Cash',
+                  note,
+                  date: new Date().toISOString().split('T')[0]
+                });
+                onClose();
+             }}
+             className="w-full py-2.5 bg-gray-900 hover:bg-black text-white rounded-lg font-medium shadow-lg transition-all active:scale-95"
            >
-             {isSubmitting && <Loader2 size={16} className="animate-spin" />}
              Save Transaction
            </button>
         </div>
@@ -655,60 +603,12 @@ const AddTransactionModal = ({ isOpen, onClose, onAdd }) => {
 
 export default function MoneyManagerApp() {
   const [activeTab, setActiveTab] = useState('Trans');
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // --- API Functions ---
-  
-  const fetchTransactions = async () => {
-    try {
-        setIsLoading(true);
-        const res = await fetch(`${API_URL}/transactions`);
-        if (!res.ok) throw new Error('Backend not available');
-        const data = await res.json();
-        setTransactions(data);
-    } catch (error) {
-        console.warn('Backend not connected, utilizing fallback data.');
-        setTransactions(FALLBACK_TRANSACTIONS);
-    } finally {
-        setIsLoading(false);
-    }
+  const handleAddTransaction = (newTx) => {
+    setTransactions([newTx, ...transactions]);
   };
-
-  const handleAddTransaction = async (newTx) => {
-    try {
-        const res = await fetch(`${API_URL}/transactions`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newTx)
-        });
-        if (!res.ok) throw new Error('Failed to save');
-        const savedTx = await res.json();
-        setTransactions(prev => [savedTx, ...prev]);
-    } catch (error) {
-        // Fallback for demo
-        console.warn('Backend save failed, using local state');
-        setTransactions(prev => [newTx, ...prev]);
-    }
-  };
-  
-  const handleDeleteTransaction = async (id) => {
-      try {
-          const res = await fetch(`${API_URL}/transactions/${id}`, {
-              method: 'DELETE'
-          });
-          if (!res.ok) throw new Error('Failed to delete');
-          setTransactions(prev => prev.filter(t => t.id !== id));
-      } catch (error) {
-          console.warn('Backend delete failed, using local state');
-          setTransactions(prev => prev.filter(t => t.id !== id));
-      }
-  }
-
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
 
   const navItems = [
     { id: 'Trans', icon: LayoutDashboard, label: 'Dashboard' },
@@ -768,9 +668,9 @@ export default function MoneyManagerApp() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full overflow-hidden bg-gray-50/50">
         <div className="flex-1 overflow-hidden p-6 relative">
-           {activeTab === 'Trans' && <TransactionsView transactions={transactions} onDelete={handleDeleteTransaction} isLoading={isLoading} />}
-           {activeTab === 'Stats' && <StatsView transactions={transactions} />}
-           {activeTab === 'Accounts' && <AccountsView transactions={transactions} />}
+           {activeTab === 'Trans' && <TransactionsView transactions={transactions} />}
+           {activeTab === 'Stats' && <StatsView />}
+           {activeTab === 'Accounts' && <AccountsView />}
            {activeTab === 'Settings' && (
              <div className="h-full flex flex-col items-center justify-center text-gray-400">
                <Settings size={48} className="mb-4 opacity-20" />
