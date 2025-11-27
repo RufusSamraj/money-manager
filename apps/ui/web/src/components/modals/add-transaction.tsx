@@ -1,13 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { COLORS } from "../../constants";
 import { X } from "lucide-react";
 
 export function AddTransactionModal({ isOpen, onClose, onAdd }) {
 
   const [type, setType] = useState('expense');
+  const [date, setDate] = useState("");
+const [time, setTime] = useState("");
+  const [account, setAccount] = useState(null);
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [category, setCategory] = useState('Food');
+
+  const [categories, setCategories] = useState([]);
+const [accounts, setAccounts] = useState([]);
+
+
+useEffect(() => {
+  fetch("http://localhost:3000/api/categories")
+    .then(res => res.json())
+    .then(setCategories);
+
+  fetch("http://localhost:3000/api/accounts")
+    .then(res => res.json())
+    .then(setAccounts);
+}, []);
 
   if (!isOpen) return null;
 
@@ -48,15 +65,19 @@ export function AddTransactionModal({ isOpen, onClose, onAdd }) {
                <label className="text-xs font-semibold text-gray-500">Date</label>
                <input 
                  type="date" 
-                 defaultValue="2025-07-29"
+                 value={date}
+  onChange={(e) => setDate(e.target.value)}
+                //  defaultValue={`${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`}
                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all" 
                />
              </div>
              <div className="flex-1 space-y-1">
                <label className="text-xs font-semibold text-gray-500">Time</label>
                <input 
-                 type="text" 
-                 defaultValue="12:50 PM"
+                 type="time"
+                 value={time}
+  onChange={(e) => setTime(e.target.value)}
+                //  defaultValue={`${new Date().getHours()}:${new Date().getMinutes()}`}
                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all" 
                />
              </div>
@@ -64,10 +85,16 @@ export function AddTransactionModal({ isOpen, onClose, onAdd }) {
 
           <div className="space-y-1">
              <label className="text-xs font-semibold text-gray-500">Account</label>
-             <select className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all bg-white">
-               <option>Cash</option>
+             <select   value={account}
+  onChange={(e) => setAccount(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all bg-white">
+               {/* <option>Cash</option>
                <option>Bank</option>
-               <option>Credit Card</option>
+               <option>Credit Card</option> */}
+               {accounts.map(acc => (
+  <option key={acc.id} value={acc.id}>
+    {acc.name}
+  </option>
+))}
              </select>
           </div>
 
@@ -103,7 +130,7 @@ export function AddTransactionModal({ isOpen, onClose, onAdd }) {
           <div className="space-y-2">
              <label className="text-xs font-semibold text-gray-500">Category</label>
              <div className="grid grid-cols-4 gap-2">
-               {Object.keys(COLORS.categoryColors).map(cat => (
+               {/* {Object.keys(COLORS.categoryColors).map(cat => (
                  <button
                    key={cat}
                    onClick={() => setCategory(cat)}
@@ -121,7 +148,25 @@ export function AddTransactionModal({ isOpen, onClose, onAdd }) {
                    </div>
                    <span className="text-[10px] text-gray-500">{cat}</span>
                  </button>
-               ))}
+               ))} */}
+               {categories.map(cat => (
+  <button
+    key={cat.id}
+    onClick={() => setCategory(cat.id)}
+    className={`flex flex-col items-center gap-1 p-2 rounded-lg border transition-all ${
+      category === cat.id 
+        ? 'bg-gray-50 border-gray-300' 
+        : 'bg-white border-transparent hover:bg-gray-50'
+    }`}
+  >
+    <div 
+      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold bg-gray-900"
+    >
+      {cat.name[0]}
+    </div>
+    <span className="text-[10px] text-gray-500">{cat.name}</span>
+  </button>
+))}
              </div>
           </div>
         </div>
@@ -129,17 +174,20 @@ export function AddTransactionModal({ isOpen, onClose, onAdd }) {
         <div className="p-4 border-t border-gray-100 bg-gray-50">
            <button 
              onClick={() => {
-                if (!amount) return;
-                onAdd({
-                  id: Date.now(),
-                  type,
-                  amount: parseFloat(amount),
-                  category,
-                  account: 'Cash',
-                  note,
-                  date: new Date().toISOString().split('T')[0]
-                });
-                onClose();
+                if (!amount || !category || !account) return;
+
+  const isoDate = `${date}T${time}`;
+
+  onAdd({
+    type,
+    amount: parseFloat(amount),
+    category,
+    account,
+    note,
+    date: isoDate
+  });
+
+  onClose();
              }}
              className="w-full py-2.5 bg-gray-900 hover:bg-black text-white rounded-lg font-medium shadow-lg transition-all active:scale-95"
            >

@@ -77,6 +77,83 @@ app.post("/api/accounts", async (req, res) => {
   }
 });
 
+app.get("/api/categories", async (req, res) => {
+  try {
+    const result = await db.select().from(schema.categories);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch categories" });
+  }
+});
+
+app.get("/api/transactions", async (req, res) => {
+  try {
+    const result = await db
+      .select({
+        id: schema.transactions.id,
+        type: schema.transactions.type,
+        date: schema.transactions.date,
+        amount: schema.transactions.amount,
+        note: schema.transactions.note,
+        toAccount: schema.transactions.toAccount,
+
+        // Relations
+        categoryId: schema.categories.id,
+        categoryName: schema.categories.name,
+
+        accountId: schema.accounts.id,
+        accountName: schema.accounts.name,
+      })
+      .from(schema.transactions)
+      .leftJoin(schema.categories, eq(schema.transactions.category, schema.categories.id))
+      .leftJoin(schema.accounts, eq(schema.transactions.account, schema.accounts.id));
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch transactions" });
+  }
+});
+
+app.post("/api/transactions", async (req, res) => {
+  try {
+    const {
+      type,        // 'income', 'expense', 'transfer'
+      date,
+      amount,
+      category,
+      account,
+      toAccount,
+      note,
+    } = req.body;
+
+    if (!type || !date || !amount) {
+      return res.status(400).json({
+        error: "type, date, and amount are required"
+      });
+    }
+
+    const result = await db
+      .insert(schema.transactions)
+      .values({
+        type,
+        date: new Date(date),
+        amount,
+        category,
+        account,
+        toAccount,
+        note,
+      })
+      .returning();
+
+    res.json(result[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to create transaction" });
+  }
+});
+
 // 1. Get All Transactions
 // app.get('/api/transactions', async (req, res) => {
 //   try {

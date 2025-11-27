@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router";
 
 import { Sidebar } from "./components/sidebar";
@@ -9,16 +9,31 @@ import { StatsPage } from "./pages/stats";
 import { AccountsPage } from "./pages/accounts";
 import { SettingsPage } from "./pages/settings";
 
-import { INITIAL_TRANSACTIONS } from "./constants";
-
 function App() {
 
-	const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
+	const [transactions, setTransactions] = useState([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+
+	useEffect(() => {
+  fetch("http://localhost:3000/api/transactions")
+    .then(res => res.json())
+    .then(setTransactions)
+    .catch(err => console.error("Failed to load transactions:", err));
+}, []);
+
   
-	const handleAddTransaction = (newTx) => {
-		setTransactions([newTx, ...transactions]);
-	};
+	async function handleAddTransaction(data) {
+  await fetch("http://localhost:3000/api/transactions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const updated = await fetch("http://localhost:3000/api/transactions")
+    .then(res => res.json());
+
+  setTransactions(updated);
+}
 
 	return (
 		<div className="flex h-screen bg-gray-50 font-sans text-gray-900 overflow-hidden">

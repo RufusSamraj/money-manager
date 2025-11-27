@@ -1,6 +1,5 @@
-import { Edit2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Card } from "../../components/card";
-import { ACCOUNTS_DATA } from "../../constants";
 import { AddAccountModal } from "../../components/modals/add-account";
 import { useEffect, useState } from "react";
 
