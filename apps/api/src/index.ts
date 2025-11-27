@@ -25,60 +25,112 @@ const db = drizzle(pool, { schema });
 
 // --- API Routes ---
 
+app.get("/api/account-groups", async (req, res) => {
+  try {
+    const groups = await db.select().from(schema.account_groups);
+    res.json(groups);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch account groups" });
+  }
+});
+
+app.get("/api/accounts", async (req, res) => {
+  try {
+    const result = await db
+      .select({
+        id: schema.accounts.id,
+        name: schema.accounts.name,
+        balance: schema.accounts.balance,
+        description: schema.accounts.description,
+        createdAt: schema.accounts.createdAt,
+        groupId: schema.account_groups.id,
+        groupName: schema.account_groups.name,
+      })
+      .from(schema.accounts)
+      .leftJoin(schema.account_groups, eq(schema.accounts.group, schema.account_groups.id));
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch accounts" });
+  }
+});
+
+app.post("/api/accounts", async (req, res) => {
+  try {
+    const { name, group, balance, description } = req.body;
+
+    if (!name) return res.status(400).json({ error: "Name is required" });
+
+    const result = await db.insert(schema.accounts).values({
+      name,
+      group,
+      balance,
+      description,
+    }).returning();
+
+    res.json(result[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to create account" });
+  }
+});
+
 // 1. Get All Transactions
-app.get('/api/transactions', async (req, res) => {
-  try {
-    const allTx = await db.select().from(schema.transactions).orderBy(desc(schema.transactions.date));
-    // Convert numeric strings to numbers for frontend
-    const formatted = allTx.map(tx => ({ ...tx, amount: parseFloat(tx.amount) }));
-    res.json(formatted);
-  } catch (err: any) {
-    console.log(err)
-    res.status(500).json({ error: err.message });
-  }
-});
+// app.get('/api/transactions', async (req, res) => {
+//   try {
+//     const allTx = await db.select().from(schema.transactions).orderBy(desc(schema.transactions.date));
+//     // Convert numeric strings to numbers for frontend
+//     const formatted = allTx.map(tx => ({ ...tx, amount: parseFloat(tx.amount) }));
+//     res.json(formatted);
+//   } catch (err: any) {
+//     console.log(err)
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
-// 2. Add Transaction
-app.post('/api/transactions', async (req, res) => {
-  try {
-    const newTx = await db.insert(schema.transactions).values(req.body).returning();
-    res.json({ ...newTx[0], amount: parseFloat(newTx[0].amount) });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// // 2. Add Transaction
+// app.post('/api/transactions', async (req, res) => {
+//   try {
+//     const newTx = await db.insert(schema.transactions).values(req.body).returning();
+//     res.json({ ...newTx[0], amount: parseFloat(newTx[0].amount) });
+//   } catch (err: any) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
-// 3. Delete Transaction
-app.delete('/api/transactions/:id', async (req, res) => {
-  try {
-    if (!req.params.id || !parseInt(req.params.id)) {
-      res.status(400).json({ error: 'invalid request' });
-    }
-    await db.delete(schema.transactions).where(eq(schema.transactions.id, req.params.id));
-    res.json({ success: true });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// // 3. Delete Transaction
+// app.delete('/api/transactions/:id', async (req, res) => {
+//   try {
+//     if (!req.params.id || !parseInt(req.params.id)) {
+//       res.status(400).json({ error: 'invalid request' });
+//     }
+//     await db.delete(schema.transactions).where(eq(schema.transactions.id, req.params.id));
+//     res.json({ success: true });
+//   } catch (err: any) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
-// 4. Get Accounts (Calculated dynamically from transactions + initial state)
-app.get('/api/accounts', async (req, res) => {
-  try {
-    // In a real app, you'd fetch accounts and sum transactions per account via SQL
-    // For this demo, we'll return the base accounts and let frontend calculate totals
-    // or you could calculate it here. Let's return the raw accounts list.
-    const allAccounts = await db.select().from(schema.accounts);
-    res.json(allAccounts);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// // 4. Get Accounts (Calculated dynamically from transactions + initial state)
+// app.get('/api/accounts', async (req, res) => {
+//   try {
+//     // In a real app, you'd fetch accounts and sum transactions per account via SQL
+//     // For this demo, we'll return the base accounts and let frontend calculate totals
+//     // or you could calculate it here. Let's return the raw accounts list.
+//     const allAccounts = await db.select().from(schema.accounts);
+//     res.json(allAccounts);
+//   } catch (err: any) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
-// Seed Endpoint (Optional: to populate initial data)
-app.post('/api/seed', async (req, res) => {
-    // Add logic here to insert INITIAL_TRANSACTIONS if db is empty
-    res.json({ message: "Seeding implemented as needed" });
-});
+// // Seed Endpoint (Optional: to populate initial data)
+// app.post('/api/seed', async (req, res) => {
+//     // Add logic here to insert INITIAL_TRANSACTIONS if db is empty
+//     res.json({ message: "Seeding implemented as needed" });
+// });
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
