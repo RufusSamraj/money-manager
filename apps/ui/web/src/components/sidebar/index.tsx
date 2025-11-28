@@ -1,17 +1,16 @@
 import { 
   Search, Star, SlidersHorizontal, ChevronLeft, ChevronRight, 
   LayoutDashboard, PieChart, CreditCard, Settings, Plus, Wallet, 
-  Edit2, Filter, X, Check
+  Edit2, Filter, X, Check,
+  Upload
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
-export function Sidebar({ isModalOpen, setIsModalOpen }) {
+export function Sidebar({ isModalOpen, setIsModalOpen, excelModal, setExcelModal }) {
 
 
     const [activeTab, setActiveTab] = useState('Trans');
-
-      // const [isModalOpen, setIsModalOpen] = useState(false);
 
     const navItems = [
     { id: 'Trans', icon: LayoutDashboard, label: 'Dashboard', route: '/' },
@@ -63,6 +62,13 @@ export function Sidebar({ isModalOpen, setIsModalOpen }) {
            >
              <Plus size={18} strokeWidth={2.5} />
              New Transaction
+           </button>
+           <button 
+             onClick={() => setExcelModal(true)}
+             className="mt-4 w-full flex items-center justify-center gap-2 bg-white text-black hover:bg-red-600 hover:text-white py-3 rounded-xl shadow-lg hover:shadow-red-200 transition-all active:scale-95 font-medium text-sm"
+           >
+             <Upload size={18} strokeWidth={2.5} />
+             Upload excel
            </button>
         </div>
       </aside>

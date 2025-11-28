@@ -8,12 +8,14 @@ import { TransactionsPage } from "./pages/transactions";
 import { StatsPage } from "./pages/stats";
 import { AccountsPage } from "./pages/accounts";
 import { SettingsPage } from "./pages/settings";
+import { UploadExcelModal } from "./components/modals/upload-excel";
 
 function App() {
 
 	const [transactions, setTransactions] = useState([]);
 	const [categories, setCategories] = useState([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [excelModal, setExcelModal] = useState(false);
 
 	useEffect(() => {
   async function loadData() {
@@ -56,9 +58,22 @@ function App() {
   setTransactions(updated);
 }
 
+	async function handleUploadExcel() {
+//   await fetch("http://localhost:3000/api/transactions", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(data),
+//   });
+
+  const updated = await fetch("http://localhost:3000/api/transactions")
+    .then(res => res.json());
+
+  setTransactions(updated);
+}
+
 	return (
 		<div className="flex h-screen bg-gray-50 font-sans text-gray-900 overflow-hidden">
-			<Sidebar isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+			<Sidebar isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} excelModal={excelModal} setExcelModal={setExcelModal} />
 
 			<main className="flex-1 flex flex-col h-full overflow-hidden bg-gray-50/50">
 				<div className="flex-1 overflow-hidden p-6 relative">
@@ -75,6 +90,12 @@ function App() {
 				isOpen={isModalOpen} 
 				onClose={() => setIsModalOpen(false)}
 				onAdd={handleAddTransaction}
+			/>
+
+			<UploadExcelModal
+				isOpen={excelModal} 
+				onClose={() => setExcelModal(false)}
+				onAdd={handleUploadExcel}
 			/>
 		</div>
 	);

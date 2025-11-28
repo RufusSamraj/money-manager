@@ -154,6 +154,40 @@ app.post("/api/transactions", async (req, res) => {
   }
 });
 
+app.post("/api/transactions/bulk", async (req, res) => {
+  try {
+    const rows = req.body; // array
+
+    for (const r of rows) {
+      // Lookup category ID by name
+      const cat = await db.query.categories.findFirst({
+        where: eq(schema.categories.name, r.categoryName)
+      });
+
+      // Lookup account ID by name
+      const acc = await db.query.accounts.findFirst({
+        where: eq(schema.accounts.name, r.accountName)
+      });
+
+      await db.insert(schema.transactions).values({
+        type: r.type,
+        date: new Date(r.date),
+        amount: r.amount,
+        category: cat?.id || null,
+        account: acc?.id || null,
+        note: r.note
+      });
+    }
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Excel bulk upload failed" });
+  }
+});
+
+
 // 1. Get All Transactions
 // app.get('/api/transactions', async (req, res) => {
 //   try {
