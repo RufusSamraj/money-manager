@@ -12,14 +12,35 @@ import { SettingsPage } from "./pages/settings";
 function App() {
 
 	const [transactions, setTransactions] = useState([]);
+	const [categories, setCategories] = useState([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	useEffect(() => {
-  fetch("http://localhost:3000/api/transactions")
-    .then(res => res.json())
-    .then(setTransactions)
-    .catch(err => console.error("Failed to load transactions:", err));
+  async function loadData() {
+    try {
+      const [txRes, catRes] = await Promise.all([
+        fetch("http://localhost:3000/api/transactions"),
+        fetch("http://localhost:3000/api/categories")
+      ]);
+
+      setTransactions(await txRes.json());
+      setCategories(await catRes.json());
+
+    } catch (err) {
+      console.error("Failed to load data:", err);
+    }
+  }
+
+  loadData();
 }, []);
+	
+
+// 	useEffect(() => {
+//   fetch("http://localhost:3000/api/transactions")
+//     .then(res => res.json())
+//     .then(setTransactions)
+//     .catch(err => console.error("Failed to load transactions:", err));
+// }, []);
 
   
 	async function handleAddTransaction(data) {
@@ -43,7 +64,7 @@ function App() {
 				<div className="flex-1 overflow-hidden p-6 relative">
 					<Routes>
 						<Route path="/" element={<TransactionsPage transactions={transactions} />} />
-						<Route path="/stats" element={<StatsPage />} />
+						<Route path="/stats" element={<StatsPage statsTransactions={transactions} categories={categories} />} />
 						<Route path="/accounts" element={<AccountsPage />} />
 						<Route path="/settings" element={<SettingsPage />} />
 					</Routes>
