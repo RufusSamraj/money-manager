@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { COLORS } from "../../constants";
 import { X } from "lucide-react";
 
 export function AddTransactionModal({ isOpen, onClose, onAdd }) {
@@ -17,14 +16,26 @@ const [accounts, setAccounts] = useState([]);
 
 
 useEffect(() => {
-  fetch("http://localhost:3000/api/categories")
+  // fetch categories
+  fetch("http://localhost:3000/api/categories", {
+    credentials: "include",
+  })
     .then(res => res.json())
     .then(setCategories);
 
-  fetch("http://localhost:3000/api/accounts")
+  // fetch accounts and set default selection
+  fetch("http://localhost:3000/api/accounts", {
+    credentials: "include",
+  })
     .then(res => res.json())
-    .then(setAccounts);
+    .then(data => {
+      setAccounts(data);
+      if (data.length > 0) {
+        setAccount(data[0].id);   // 👈 DEFAULT ACCOUNT SET HERE
+      }
+    });
 }, []);
+
 
   if (!isOpen) return null;
 

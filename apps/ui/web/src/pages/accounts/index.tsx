@@ -10,7 +10,7 @@ export function AccountsPage() {
   const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
-  fetch("http://localhost:3000/api/accounts")
+  fetch("http://localhost:3000/api/accounts", {credentials: "include"})
     .then(res => res.json())
     .then(setAccounts);
 }, []);
@@ -61,6 +61,7 @@ const totals = computeTotals(accounts);
     await fetch("http://localhost:3000/api/accounts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: 'include',
       body: JSON.stringify({
         name: data.name,
         balance: data.amount,
@@ -68,6 +69,9 @@ const totals = computeTotals(accounts);
         group: data.groupId,  // will fix below
       }),
     });
+    fetch("http://localhost:3000/api/accounts", {credentials: "include"})
+    .then(res => res.json())
+    .then(setAccounts);
   }
 
     return (
@@ -119,7 +123,7 @@ const totals = computeTotals(accounts);
           </Card>
         ))}
         
-        <button className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 text-sm font-medium hover:border-blue-300 hover:text-blue-500 hover:bg-blue-50 transition-all">
+        <button onClick={() => setIsModalOpen(true)} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 text-sm font-medium hover:border-blue-300 hover:text-blue-500 hover:bg-blue-50 transition-all">
            + Add New Account
         </button>
       </div>

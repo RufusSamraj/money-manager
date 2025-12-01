@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router";
+import { Routes, Route, useLocation } from "react-router";
 
 import { Sidebar } from "./components/sidebar";
 import { AddTransactionModal } from "./components/modals/add-transaction";
@@ -9,6 +9,10 @@ import { StatsPage } from "./pages/stats";
 import { AccountsPage } from "./pages/accounts";
 import { SettingsPage } from "./pages/settings";
 import { UploadExcelModal } from "./components/modals/upload-excel";
+import { LoginPage } from "./pages/auth/login";
+import { RegisterPage } from "./pages/auth/register";
+import { VerifyOTPPage } from "./pages/auth/verify-otp";
+import { ProtectedRoute } from "./pages/protected";
 
 function App() {
 
@@ -16,13 +20,19 @@ function App() {
 	const [categories, setCategories] = useState([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [excelModal, setExcelModal] = useState(false);
+	const location = useLocation();
+
+const authRoutes = ["/login", "/register", "/verify"];
+const isAuthPage = authRoutes.includes(location.pathname);
 
 	useEffect(() => {
   async function loadData() {
     try {
       const [txRes, catRes] = await Promise.all([
-        fetch("http://localhost:3000/api/transactions"),
-        fetch("http://localhost:3000/api/categories")
+        fetch("http://localhost:3000/api/transactions", {
+      credentials: 'include'}),
+        fetch("http://localhost:3000/api/categories", {
+      credentials: 'include'})
       ]);
 
       setTransactions(await txRes.json());
@@ -50,9 +60,12 @@ function App() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+
+      credentials: 'include',
   });
 
-  const updated = await fetch("http://localhost:3000/api/transactions")
+  const updated = await fetch("http://localhost:3000/api/transactions", {
+      credentials: 'include'})
     .then(res => res.json());
 
   setTransactions(updated);
@@ -65,40 +78,69 @@ function App() {
 //     body: JSON.stringify(data),
 //   });
 
-  const updated = await fetch("http://localhost:3000/api/transactions")
+  const updated = await fetch("http://localhost:3000/api/transactions", {
+      credentials: 'include'})
     .then(res => res.json());
 
   setTransactions(updated);
 }
 
 	return (
-		<div className="flex h-screen bg-gray-50 font-sans text-gray-900 overflow-hidden">
-			<Sidebar isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} excelModal={excelModal} setExcelModal={setExcelModal} />
+  <div className="h-screen w-screen overflow-hidden">
+    {isAuthPage ? (
+      // --------------------------
+      // AUTH LAYOUT (no sidebar)
+      // --------------------------
+      <div className="flex w-full items-center justify-center h-full bg-gray-50">
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify" element={<VerifyOTPPage />} />
+        </Routes>
+      </div>
+    ) : (
+      // --------------------------
+      // APP LAYOUT (sidebar + content)
+      // --------------------------
+      <div className="flex h-full bg-gray-50 font-sans text-gray-900 overflow-hidden">
+        
+        {/* SIDEBAR */}
+        <Sidebar
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          excelModal={excelModal}
+          setExcelModal={setExcelModal}
+        />
 
-			<main className="flex-1 flex flex-col h-full overflow-hidden bg-gray-50/50">
-				<div className="flex-1 overflow-hidden p-6 relative">
-					<Routes>
-						<Route path="/" element={<TransactionsPage transactions={transactions} />} />
-						<Route path="/stats" element={<StatsPage statsTransactions={transactions} categories={categories} />} />
-						<Route path="/accounts" element={<AccountsPage />} />
-						<Route path="/settings" element={<SettingsPage />} />
-					</Routes>
-				</div>
-			</main>
+        {/* MAIN CONTENT */}
+        <main className="flex-1 flex flex-col h-full overflow-hidden bg-gray-50/50">
+          <div className="flex-1 overflow-hidden p-6 relative">
+            <Routes>
+              <Route path="/" element={<ProtectedRoute><TransactionsPage transactions={transactions} /></ProtectedRoute>} />
+              <Route path="/stats" element={<ProtectedRoute><StatsPage statsTransactions={transactions} categories={categories} /></ProtectedRoute>} />
+              <Route path="/accounts" element={<ProtectedRoute><AccountsPage /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            </Routes>
+          </div>
+        </main>
 
-			<AddTransactionModal
-				isOpen={isModalOpen} 
-				onClose={() => setIsModalOpen(false)}
-				onAdd={handleAddTransaction}
-			/>
+        {/* MODALS */}
+        <AddTransactionModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onAdd={handleAddTransaction}
+        />
 
-			<UploadExcelModal
-				isOpen={excelModal} 
-				onClose={() => setExcelModal(false)}
-				onAdd={handleUploadExcel}
-			/>
-		</div>
-	);
+        <UploadExcelModal
+          isOpen={excelModal}
+          onClose={() => setExcelModal(false)}
+          onAdd={handleUploadExcel}
+        />
+      </div>
+    )}
+  </div>
+);
+
 }
 
 export default App;

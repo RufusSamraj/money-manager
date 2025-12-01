@@ -11,7 +11,8 @@ export function AddAccountModal({ isOpen, onClose, onAdd }) {
   const [description, setDescription] = useState('');
 
   useEffect(() => {
-  fetch("http://localhost:3000/api/account-groups")
+  fetch("http://localhost:3000/api/account-groups", {
+      credentials: 'include'})
     .then(res => res.json())
     .then(setGroups);
 }, []);

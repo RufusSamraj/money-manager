@@ -44,6 +44,8 @@ export function UploadExcelModal({ isOpen, onClose, onAdd }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed),
+      
+      credentials: 'include',
     });
 
     onAdd();   // reload parent
