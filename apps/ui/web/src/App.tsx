@@ -16,27 +16,24 @@ import { ProtectedRoute } from "./pages/protected";
 
 function App() {
 
-	const [transactions, setTransactions] = useState([]);
-	const [categories, setCategories] = useState([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [excelModal, setExcelModal] = useState(false);
 	const location = useLocation();
 
+	const [transactions, setTransactions] = useState([]);
 const authRoutes = ["/login", "/register", "/verify"];
 const isAuthPage = authRoutes.includes(location.pathname);
 
 	useEffect(() => {
   async function loadData() {
     try {
-      const [txRes, catRes] = await Promise.all([
+		
+      const [txRes] = await Promise.all([
         fetch("http://localhost:3000/api/transactions", {
       credentials: 'include'}),
-        fetch("http://localhost:3000/api/categories", {
-      credentials: 'include'})
       ]);
 
       setTransactions(await txRes.json());
-      setCategories(await catRes.json());
 
     } catch (err) {
       console.error("Failed to load data:", err);
@@ -116,8 +113,8 @@ const isAuthPage = authRoutes.includes(location.pathname);
         <main className="flex-1 flex flex-col h-full overflow-hidden bg-gray-50/50">
           <div className="flex-1 overflow-hidden p-6 relative">
             <Routes>
-              <Route path="/" element={<ProtectedRoute><TransactionsPage transactions={transactions} /></ProtectedRoute>} />
-              <Route path="/stats" element={<ProtectedRoute><StatsPage statsTransactions={transactions} categories={categories} /></ProtectedRoute>} />
+              <Route path="/" element={<ProtectedRoute><TransactionsPage /></ProtectedRoute>} />
+              <Route path="/stats" element={<ProtectedRoute><StatsPage /></ProtectedRoute>} />
               <Route path="/accounts" element={<ProtectedRoute><AccountsPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             </Routes>

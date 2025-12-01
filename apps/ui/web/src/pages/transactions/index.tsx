@@ -4,7 +4,30 @@ import { Badge } from "../../components/badge";
 import { MoneyText } from "../../components/money-text";
 import { ChevronLeft, ChevronRight, Filter, Search, Star, X } from "lucide-react";
 
-export function TransactionsPage({ transactions }) {
+export function TransactionsPage() {
+
+
+	const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+  async function loadData() {
+    try {
+		
+      const [txRes] = await Promise.all([
+        fetch("http://localhost:3000/api/transactions", {
+      credentials: 'include'}),
+      ]);
+
+      setTransactions(await txRes.json());
+
+    } catch (err) {
+      console.error("Failed to load data:", err);
+    }
+  }
+
+  loadData();
+}, []);
+
   const [subTab, setSubTab] = useState("Daily");
   const [expandedWeek, setExpandedWeek] = useState(null); // mondayKey like "2025-07-28"
    const [selectedDate, setSelectedDate] = useState(null);

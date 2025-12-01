@@ -16,7 +16,31 @@ import { COLORS } from "../../constants";
  *   - date
  */
 
-export function StatsPage({ statsTransactions, categories }) {
+export function StatsPage() {
+
+	const [statsTransactions, setTransactions] = useState([]);
+	const [categories, setCategories] = useState([]);
+  	useEffect(() => {
+  async function loadData() {
+    try {
+		
+      const [txRes, catRes] = await Promise.all([
+        fetch("http://localhost:3000/api/transactions", {
+      credentials: 'include'}),
+        fetch("http://localhost:3000/api/categories", {
+      credentials: 'include'})
+      ]);
+
+      setTransactions(await txRes.json());
+      setCategories(await catRes.json());
+
+    } catch (err) {
+      console.error("Failed to load data:", err);
+    }
+  }
+
+  loadData();
+}, []);
   const [mode, setMode] = useState("Stats");
 
   // ----------------------------------------------------------
