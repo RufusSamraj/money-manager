@@ -204,15 +204,20 @@ export function StatsPage() {
           <Card className="md:col-span-5 flex items-center justify-center p-8">
             <div className="relative w-56 h-56">
               <svg viewBox="0 0 100 100" className="w-full h-full">
-                {slices.map((slice, i) => (
-                  <path
-                    key={i}
-                    d={slice.pathData}
-                    fill={slice.color}
-                    stroke="#fff"
-                    strokeWidth="1"
-                  />
-                ))}
+                {slices.length === 1 ? (
+    <circle
+      cx="50"
+      cy="50"
+      r="50"
+      fill={slices[0].color}
+      stroke="#fff"
+      strokeWidth={1}
+    />
+  ) : (
+    slices.map((slice, i) => (
+      <path key={i} d={slice.pathData} fill={slice.color} stroke="#fff" />
+    ))
+  )}
                 <circle cx="50" cy="50" r="15" fill="white" />
               </svg>
 
@@ -236,7 +241,7 @@ export function StatsPage() {
 
                     {/* Color bubble with pct% */}
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-sm"
+                      className="w-12 h-12 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-sm"
                       style={{ backgroundColor: slices.find(s => s.name === cat.name)?.color }}
                     >
                       {pct.toFixed(1)}%

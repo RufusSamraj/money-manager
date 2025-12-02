@@ -66,6 +66,9 @@ const isAuthPage = authRoutes.includes(location.pathname);
     .then(res => res.json());
 
   setTransactions(updated);
+
+  window.location.reload();
+
 }
 
 	async function handleUploadExcel() {
@@ -80,6 +83,9 @@ const isAuthPage = authRoutes.includes(location.pathname);
     .then(res => res.json());
 
   setTransactions(updated);
+
+  window.location.reload();
+
 }
 
 	return (

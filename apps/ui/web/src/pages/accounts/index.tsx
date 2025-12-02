@@ -69,9 +69,12 @@ const totals = computeTotals(accounts);
         group: data.groupId,  // will fix below
       }),
     });
-    fetch("http://localhost:3000/api/accounts", {credentials: "include"})
+    await fetch("http://localhost:3000/api/accounts", {credentials: "include"})
     .then(res => res.json())
     .then(setAccounts);
+
+    window.location.reload();
+
   }
 
     return (
