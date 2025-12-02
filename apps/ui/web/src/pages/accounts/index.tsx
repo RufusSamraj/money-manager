@@ -92,7 +92,7 @@ const totals = computeTotals(accounts);
         </div>
       </div>
 
-      <Card>
+      <Card className="flex-shrink-0">
         <div className="grid grid-cols-3 divide-x divide-gray-100">
            <div className="flex flex-col items-center gap-1">
              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Assets</span>
@@ -109,7 +109,7 @@ const totals = computeTotals(accounts);
         </div>
       </Card>
 
-      <div className="flex flex-col gap-4 overflow-y-auto">
+      <div className="flex flex-col gap-4 ">
         {groups.map(group => (
           <Card key={group.title} noPadding>
              <div className="bg-gray-50 px-4 py-2 border-b border-gray-100">
