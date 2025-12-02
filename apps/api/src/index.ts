@@ -289,7 +289,6 @@ app.post("/api/transactions/bulk", auth, async (req, res) => {
 // });
 
 app.post("/api/auth/register", async (req, res) => {
-  console.log(req.body)
   try {
     const { name, email, password } = req.body;
 
