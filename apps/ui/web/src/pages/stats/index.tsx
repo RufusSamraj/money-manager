@@ -229,36 +229,40 @@ export function StatsPage() {
 
           {/* RIGHT: LIST */}
           <Card className="md:col-span-7" noPadding>
-            {categoryTotals.map((cat) => {
-              const pct = totalExpense ? (cat.amount / totalExpense) * 100 : 0;
+  {categoryTotals.map((cat) => {
+    const isSingle = categoryTotals.length === 1;
+    const pct = isSingle
+      ? 100
+      : totalExpense
+        ? (cat.amount / totalExpense) * 100
+        : 0;
 
-              return (
-                <div
-                  key={cat.name}
-                  className="flex justify-between items-center p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50"
-                >
-                  <div className="flex items-center gap-3">
+    return (
+      <div
+        key={cat.name}
+        className="flex justify-between items-center p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50"
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-12 h-12 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-sm"
+            style={{ backgroundColor: slices.find(s => s.name === cat.name)?.color }}
+          >
+            {pct.toFixed(1)}%
+          </div>
 
-                    {/* Color bubble with pct% */}
-                    <div
-                      className="w-12 h-12 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-sm"
-                      style={{ backgroundColor: slices.find(s => s.name === cat.name)?.color }}
-                    >
-                      {pct.toFixed(1)}%
-                    </div>
+          <span className="text-sm font-medium text-gray-700">
+            {cat.name}
+          </span>
+        </div>
 
-                    <span className="text-sm font-medium text-gray-700">
-                      {cat.name}
-                    </span>
-                  </div>
+        <span className="text-sm font-semibold text-gray-800">
+          ₹ {cat.amount.toFixed(2)}
+        </span>
+      </div>
+    );
+  })}
+</Card>
 
-                  <span className="text-sm font-semibold text-gray-800">
-                    ₹ {cat.amount.toFixed(2)}
-                  </span>
-                </div>
-              );
-            })}
-          </Card>
         </div>
       )}
 
