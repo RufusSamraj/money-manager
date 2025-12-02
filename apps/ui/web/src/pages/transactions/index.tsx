@@ -617,7 +617,37 @@ const monthlySummary = useMemo(() => {
 
 
   const SummaryView = () => {
-  if (!monthlySummary) return null;
+  if (!monthlySummary || Object.keys(monthlySummary).length === 0) {
+  return (
+    <Card className="p-10 flex flex-col items-center justify-center text-center gap-3">
+      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-10 h-10 text-gray-300"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </div>
+
+      <h2 className="text-lg font-semibold text-gray-700">
+        No summary for this month
+      </h2>
+
+      <p className="text-sm text-gray-500 max-w-xs">
+        Add some transactions to generate your monthly summary.
+      </p>
+    </Card>
+  );
+}
+
 
   const {
     categoryList,
@@ -732,25 +762,48 @@ const monthlySummary = useMemo(() => {
     <div className="flex flex-col h-full gap-4">
       {/* Header */}
       <Card className="flex justify-between items-center py-3">
-        <div className="flex items-center gap-2">
-          <button className="p-1.5 hover:bg-gray-100 rounded-full text-gray-500" onClick={goToPreviousMonth}>
-            <ChevronLeft size={18} />
-          </button>
+        {availableMonths.length === 0 ? (
+  <div className="flex items-center justify-center">
+  <div className="flex items-center gap-2">
+    <div className="w-2 h-2 rounded-full bg-gray-200 animate-pulse"></div>
+    <div className="w-4 h-2 rounded-full bg-gray-200 animate-pulse"></div>
+    <div className="w-2 h-2 rounded-full bg-gray-200 animate-pulse"></div>
+  </div>
+</div>
 
-          <select
-            className="text-lg font-bold text-gray-800 bg-transparent"
-            value={currentMonth || ""}
-            onChange={(e) => { setCurrentMonth(e.target.value); setExpandedWeek(null); }}
-          >
-            {availableMonths.map((m) => (
-              <option key={m} value={m}>{monthLabel(m)}</option>
-            ))}
-          </select>
+) : (
+  <div className="flex items-center gap-2">
+    <button
+      className="p-1.5 hover:bg-gray-100 rounded-full text-gray-500"
+      onClick={goToPreviousMonth}
+    >
+      <ChevronLeft size={18} />
+    </button>
 
-          <button className="p-1.5 hover:bg-gray-100 rounded-full text-gray-500" onClick={goToNextMonth}>
-            <ChevronRight size={18} />
-          </button>
-        </div>
+    <select
+      className="text-lg font-bold text-gray-800 bg-transparent"
+      value={currentMonth || ""}
+      onChange={(e) => {
+        setCurrentMonth(e.target.value);
+        setExpandedWeek(null);
+      }}
+    >
+      {availableMonths.map((m) => (
+        <option key={m} value={m}>
+          {monthLabel(m)}
+        </option>
+      ))}
+    </select>
+
+    <button
+      className="p-1.5 hover:bg-gray-100 rounded-full text-gray-500"
+      onClick={goToNextMonth}
+    >
+      <ChevronRight size={18} />
+    </button>
+  </div>
+)}
+
 
         <div className="flex items-center gap-2">
           {/* <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full text-xs font-medium text-gray-600">
@@ -850,7 +903,33 @@ const monthlySummary = useMemo(() => {
           groupedByDay.length ? (
             groupedByDay.map(([date, items]) => <DateGroup key={date} date={date} items={items} />)
           ) : (
-            <div className="text-center text-gray-400 mt-20">No transactions</div>
+           <div className="flex flex-col items-center justify-center mt-20 text-center gap-3">
+  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center shadow-sm">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-10 h-10 text-gray-300"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M3 3v18h18M7 9h6m-6 4h4m7-1v7m0 0h-7m7 0l-3-3"
+      />
+    </svg>
+  </div>
+
+  <h3 className="text-lg font-semibold text-gray-700">
+    No transactions yet
+  </h3>
+
+  <p className="text-sm text-gray-500 max-w-xs">
+    Add your first transaction to start tracking your expenses.
+  </p>
+</div>
+
           )
         ) : subTab === "Weekly" ? (
           <div className="flex flex-col gap-4">
@@ -888,7 +967,33 @@ const monthlySummary = useMemo(() => {
                 </div>
               );
             }) : (
-              <div className="text-center text-gray-400 mt-20">No transactions</div>
+              <div className="flex flex-col items-center justify-center mt-20 text-center gap-3">
+  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center shadow-sm">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-10 h-10 text-gray-300"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M3 3v18h18M7 9h6m-6 4h4m7-1v7m0 0h-7m7 0l-3-3"
+      />
+    </svg>
+  </div>
+
+  <h3 className="text-lg font-semibold text-gray-700">
+    No transactions yet
+  </h3>
+
+  <p className="text-sm text-gray-500 max-w-xs">
+    Add your first transaction to start tracking your expenses.
+  </p>
+</div>
+
             )}
           </div>
         ) : subTab === "Summary" ? (
