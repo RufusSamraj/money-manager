@@ -6,19 +6,22 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const res = await fetch("http://localhost:3000/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include", // important for cookies
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
+    setLoading(false);
 
     if (!res.ok) {
       setError(data.error || "Login failed");
@@ -44,6 +47,7 @@ export function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           type="email"
+          disabled={loading}
         />
 
         <input
@@ -52,17 +56,25 @@ export function LoginPage() {
           value={password}
           type="password"
           onChange={(e) => setPassword(e.target.value)}
+          disabled={loading}
         />
 
-        <button className="w-full py-2 bg-black text-white rounded-lg hover:bg-gray-800">
-          Login
+        <button
+          disabled={loading}
+          className={`w-full py-2 rounded-lg text-white transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-black hover:bg-gray-800"
+          }`}
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="text-sm text-gray-600 text-center">
           New here?{" "}
           <span
             className="text-blue-600 cursor-pointer"
-            onClick={() => nav("/register")}
+            onClick={() => !loading && nav("/register")}
           >
             Create account
           </span>

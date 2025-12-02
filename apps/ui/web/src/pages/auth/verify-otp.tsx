@@ -8,6 +8,7 @@ export function VerifyOTPPage() {
 
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (!email) {
     return (
@@ -20,6 +21,7 @@ export function VerifyOTPPage() {
   async function handleVerify(e) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const res = await fetch("http://localhost:3000/api/auth/verify", {
       method: "POST",
@@ -29,6 +31,8 @@ export function VerifyOTPPage() {
     });
 
     const data = await res.json();
+    setLoading(false);
+
     if (!res.ok) {
       setError(data.error || "Invalid OTP");
       return;
@@ -56,8 +60,15 @@ export function VerifyOTPPage() {
           onChange={(e) => setOtp(e.target.value)}
         />
 
-        <button className="w-full py-2 bg-black text-white rounded-lg hover:bg-gray-800">
-          Verify
+        <button
+          disabled={loading}
+          className={`w-full py-2 rounded-lg text-white transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-black hover:bg-gray-800"
+          }`}
+        >
+          {loading ? "Verifying..." : "Verify"}
         </button>
       </form>
     </div>

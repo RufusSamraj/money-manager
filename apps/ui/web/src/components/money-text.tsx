@@ -4,7 +4,7 @@ export const MoneyText = ({ amount, type, className = '' }) => {
   
   return (
     <span className={`font-medium ${colorClass} ${className} whitespace-nowrap`}>
-      {type === 'expense' ? '- ' : ''}$ {Math.abs(amount).toFixed(2)}
+      {type === 'expense' ? '- ' : ''}₹ {Math.abs(amount).toFixed(2)}
     </span>
   );
 };

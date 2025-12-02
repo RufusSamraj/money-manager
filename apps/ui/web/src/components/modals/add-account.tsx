@@ -47,7 +47,7 @@ export function AddAccountModal({ isOpen, onClose, onAdd }) {
           <div className="space-y-1">
              <label className="text-xs font-semibold text-gray-500">Amount</label>
              <div className="relative">
-               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₹</span>
                <input 
                  type="number"
                  placeholder="0.00"

@@ -9,10 +9,12 @@ export function RegisterPage() {
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleRegister(e) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const res = await fetch("http://localhost:3000/api/auth/register", {
       method: "POST",
@@ -22,6 +24,9 @@ export function RegisterPage() {
     });
 
     const data = await res.json();
+
+    setLoading(false); // ← stop loading
+
     if (!res.ok) {
       setError(data.error || "Registration failed");
       return;
@@ -31,7 +36,7 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen ">
+    <div className="flex items-center justify-center h-screen">
       <form
         onSubmit={handleRegister}
         className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-4"
@@ -63,8 +68,15 @@ export function RegisterPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="w-full py-2 bg-black text-white rounded-lg hover:bg-gray-800">
-          Register
+        <button
+          disabled={loading}
+          className={`w-full py-2 rounded-lg text-white transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-black hover:bg-gray-800"
+          }`}
+        >
+          {loading ? "Registering..." : "Register"}
         </button>
 
         <p className="text-sm text-gray-600 text-center">

@@ -96,15 +96,15 @@ const totals = computeTotals(accounts);
         <div className="grid grid-cols-3 divide-x divide-gray-100">
            <div className="flex flex-col items-center gap-1">
              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Assets</span>
-             <span className="text-xl font-bold text-blue-500">$ {totals.assets.toFixed(2)}</span>
+             <span className="text-xl font-bold text-blue-500">₹ {totals.assets.toFixed(2)}</span>
            </div>
            <div className="flex flex-col items-center gap-1">
              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Liabilities</span>
-             <span className="text-xl font-bold text-red-500">$ {totals.liabilities.toFixed(2)}</span>
+             <span className="text-xl font-bold text-red-500">₹ {totals.liabilities.toFixed(2)}</span>
            </div>
            <div className="flex flex-col items-center gap-1">
              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Total</span>
-             <span className="text-xl font-bold text-gray-800">$ {totals.total.toFixed(2)}</span>
+             <span className="text-xl font-bold text-gray-800">₹ {totals.total.toFixed(2)}</span>
            </div>
         </div>
       </Card>
@@ -119,7 +119,7 @@ const totals = computeTotals(accounts);
                <div key={idx} className="flex justify-between items-center px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
                   <span className="text-sm font-medium text-gray-700">{item.name}</span>
                   <span className={`text-sm font-semibold ${item.type === 'liability' ? 'text-red-500' : 'text-blue-500'}`}>
-                    $ {Math.abs(item.amount).toFixed(2)}
+                    ₹ {Math.abs(item.amount).toFixed(2)}
                   </span>
                </div>
              ))}

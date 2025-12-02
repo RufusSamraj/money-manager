@@ -26,6 +26,7 @@
  - `cd apps/api`
  - `pnpm i`
  - `pnpm db:push`
+ - `pnpm db:seed`
  - `pnpm dev`
 #### Frontend
  - `cd apps/ui/web`
