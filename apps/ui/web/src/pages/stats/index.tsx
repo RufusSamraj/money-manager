@@ -173,7 +173,7 @@ export function StatsPage() {
       {/* TOP BAR */}
       <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
         <div className="bg-gray-100 p-1 rounded-md flex">
-          {["Stats", "Note"].map((m) => (
+          {["Stats"].map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}
