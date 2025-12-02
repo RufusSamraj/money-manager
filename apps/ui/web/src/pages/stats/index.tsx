@@ -197,74 +197,108 @@ export function StatsPage() {
         </div>
       </div>
 
-      {/* MODE 1: CATEGORY STATS (Pie + List) */}
       {mode === "Stats" && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* LEFT: PIE */}
-          <Card className="md:col-span-5 flex items-center justify-center p-8">
-            <div className="relative w-56 h-56">
-              <svg viewBox="0 0 100 100" className="w-full h-full">
-                {slices.length === 1 ? (
-    <circle
-      cx="50"
-      cy="50"
-      r="50"
-      fill={slices[0].color}
-      stroke="#fff"
-      strokeWidth={1}
-    />
-  ) : (
-    slices.map((slice, i) => (
-      <path key={i} d={slice.pathData} fill={slice.color} stroke="#fff" />
-    ))
-  )}
-                <circle cx="50" cy="50" r="15" fill="white" />
-              </svg>
-
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs font-bold text-gray-400">TOTAL</span>
-              </div>
-            </div>
-          </Card>
-
-          {/* RIGHT: LIST */}
-          <Card className="md:col-span-7" noPadding>
-  {categoryTotals.map((cat) => {
-    const isSingle = categoryTotals.length === 1;
-    const pct = isSingle
-      ? 100
-      : totalExpense
-        ? (cat.amount / totalExpense) * 100
-        : 0;
-
-    return (
-      <div
-        key={cat.name}
-        className="flex justify-between items-center p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50"
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-12 h-12 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-sm"
-            style={{ backgroundColor: slices.find(s => s.name === cat.name)?.color }}
-          >
-            {pct.toFixed(1)}%
-          </div>
-
-          <span className="text-sm font-medium text-gray-700">
-            {cat.name}
-          </span>
-        </div>
-
-        <span className="text-sm font-semibold text-gray-800">
-          ₹ {cat.amount.toFixed(2)}
-        </span>
+  categoryTotals.length === 0 ? (
+    <Card className="p-10 flex flex-col items-center justify-center text-center gap-3">
+      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-10 h-10 text-gray-300"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
       </div>
-    );
-  })}
-</Card>
 
+      <h2 className="text-lg font-semibold text-gray-700">
+        No categories available
+      </h2>
+
+      <p className="text-sm text-gray-500">
+        Add some transactions to see category statistics.
+      </p>
+    </Card>
+  ) : (
+    // your original chart code here
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      {/* LEFT: PIE */}
+      <Card className="md:col-span-5 flex items-center justify-center p-8">
+        <div className="relative w-56 h-56">
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            {slices.length === 1 ? (
+              <circle
+                cx="50"
+                cy="50"
+                r="50"
+                fill={slices[0].color}
+                stroke="#fff"
+                strokeWidth={1}
+              />
+            ) : (
+              slices.map((slice, i) => (
+                <path
+                  key={i}
+                  d={slice.pathData}
+                  fill={slice.color}
+                  stroke="#fff"
+                />
+              ))
+            )}
+
+            <circle cx="50" cy="50" r="15" fill="white" />
+          </svg>
+
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-xs font-bold text-gray-400">TOTAL</span>
+          </div>
         </div>
-      )}
+      </Card>
+
+      {/* RIGHT: LIST */}
+      <Card className="md:col-span-7" noPadding>
+        {categoryTotals.map((cat) => {
+          const isSingle = categoryTotals.length === 1;
+          const rawPct = totalExpense ? (cat.amount / totalExpense) * 100 : 0;
+          const pct = isSingle ? 100 : (!isFinite(rawPct) ? 0 : rawPct);
+
+          return (
+            <div
+              key={cat.name}
+              className="flex justify-between items-center p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-12 h-12 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-sm"
+                  style={{
+                    backgroundColor: slices.find((s) => s.name === cat.name)?.color,
+                  }}
+                >
+                  {pct.toFixed(1)}%
+                </div>
+
+                <span className="text-sm font-medium text-gray-700">
+                  {cat.name}
+                </span>
+              </div>
+
+              <span className="text-sm font-semibold text-gray-800">
+                ₹ {cat.amount.toFixed(2)}
+              </span>
+            </div>
+          );
+        })}
+      </Card>
+    </div>
+  )
+)}
+
 
       {/* MODE 2: BUDGET (Simple dynamic showcase) */}
       {mode === "Budget" && (
