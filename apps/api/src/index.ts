@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { eq, desc, and } from 'drizzle-orm';
+import { eq, desc, and, gte, lt } from 'drizzle-orm';
 import * as schema from './db/schema';
 import nodemailer from "nodemailer"
 import bcrypt from "bcrypt"
@@ -30,7 +30,7 @@ const port = 3000;
 // Middleware
 // app.use(cors()); // Allow frontend to connect
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "http://localhost:4173", "http://localhost:4200"],
   credentials: true,
 }));
 
@@ -151,6 +151,54 @@ app.get("/api/transactions", auth, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch transactions" });
   }
 });
+
+app.get("/api/transactions/by-month", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const year = Number(req.query.year);
+    const month = Number(req.query.month);
+
+    if (!year || !month) {
+      return res.status(400).json({ error: "year and month are required" });
+    }
+
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 1); // next month
+
+    const result = await db
+      .select({
+        id: schema.transactions.id,
+        type: schema.transactions.type,
+        date: schema.transactions.date,
+        amount: schema.transactions.amount,
+        note: schema.transactions.note,
+        toAccount: schema.transactions.toAccount,
+
+        categoryId: schema.categories.id,
+        categoryName: schema.categories.name,
+
+        accountId: schema.accounts.id,
+        accountName: schema.accounts.name,
+      })
+      .from(schema.transactions)
+      .leftJoin(schema.categories, eq(schema.transactions.category, schema.categories.id))
+      .leftJoin(schema.accounts, eq(schema.transactions.account, schema.accounts.id))
+      .where(
+        and(
+          eq(schema.transactions.userId, userId),
+          gte(schema.transactions.date, startDate),
+          lt(schema.transactions.date, endDate)
+        )
+      );
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch transactions" });
+  }
+});
+
 
 app.post("/api/transactions", auth, async (req, res) => {
   try {

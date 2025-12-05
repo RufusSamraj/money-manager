@@ -1,1 +1,33 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ----------------- LIGHT THEME ----------------- */
+.bg-surface     { @apply bg-white; }
+.bg-surface-50  { @apply bg-gray-50; }
+.bg-surface-100 { @apply bg-gray-100; }
+
+.text-main      { @apply text-gray-800; }
+.text-muted     { @apply text-gray-500; }
+.text-subtle    { @apply text-gray-400; }
+.text-stronger { @apply text-gray-900; }
+
+.border-soft    { @apply border-gray-100; }
+
+.shadow-card    { @apply shadow-sm; }
+
+/* ----------------- DARK THEME ------------------ */
+.dark .bg-surface     { @apply bg-gray-900; }
+.dark .bg-surface-50  { @apply bg-gray-800; }
+.dark .bg-surface-100 { @apply bg-gray-700; }
+
+.dark .text-main      { @apply text-gray-100; }
+.dark .text-muted     { @apply text-gray-300; }
+.dark .text-subtle    { @apply text-gray-400; }
+.dark .text-stronger { @apply text-gray-100; }
+
+.dark .border-soft    { @apply border-gray-700; }
+
+.dark .shadow-card    { @apply shadow-none; }
+
+

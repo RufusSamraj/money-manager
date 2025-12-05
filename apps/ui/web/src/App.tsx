@@ -116,7 +116,7 @@ const isAuthPage = authRoutes.includes(location.pathname);
         />
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden bg-gray-50/50">
+        <main className="bg-surface flex-1 flex flex-col h-full overflow-hidden bg-gray-50/50">
           <div className="flex-1 overflow-y-scroll p-6 relative">
             <Routes>
               <Route path="/" element={<ProtectedRoute><TransactionsPage /></ProtectedRoute>} />
