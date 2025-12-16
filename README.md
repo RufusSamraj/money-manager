@@ -16,9 +16,11 @@
 
 ## Env setup for Nodemailer & Auth 
  - Add these to your `apps/api/.env` file:
-    - `JWT_SECRET`
-    - `SMTP_USER`
-    - `SMTP_PASS`
+    - `JWT_SECRET=<your-value>`
+    - `SMTP_USER=<your-value>`
+    - `SMTP_PASS=<your-value>`
+ - Create these files `apps/ui/web/.env.development` and `apps/ui/web/.env.production`. Add the value below to both the files:
+    - `VITE_API_BASE_URL=http://localhost:3000/api`
 
 ## Running the Application
 ### Paste these commands in the terminal
