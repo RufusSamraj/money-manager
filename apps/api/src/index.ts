@@ -71,7 +71,7 @@ async function seedCategoriesForUser(userId: number) {
 
 // --- API Routes ---
 
-app.get("/api/account-groups", async (req, res) => {
+app.get("/api/account-groups", auth, async (req, res) => {
   try {
     const groups = await db.select().from(schema.account_groups);
     res.json(groups);
@@ -81,23 +81,23 @@ app.get("/api/account-groups", async (req, res) => {
   }
 });
 
-app.get("/api/categories", async (req, res) => {
+app.get("/api/categories", auth, async (req, res) => {
   try {
 
     const userId = req.user.id;
-
+    
     const result = await db.select().from(schema.categories).where(eq(schema.categories.userId, userId)).orderBy(asc(schema.categories.name));
     res.json(result);
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.status(500).json({ error: "Failed to fetch categories" });
   }
 });
 
-app.post("/api/categories", async (req, res) => {
+app.post("/api/categories", auth, async (req, res) => {
   try {
     const { name } = req.body;
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
 
     if (!name) {
       return res.status(400).json({ error: "Category name is required" });
@@ -115,7 +115,7 @@ app.post("/api/categories", async (req, res) => {
   }
 });
 
-app.put("/api/categories/:id", async (req, res) => {
+app.put("/api/categories/:id", auth, async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { name } = req.body;
@@ -142,7 +142,7 @@ app.put("/api/categories/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to update category" });
   }
 });
-app.delete("/api/categories/:id", async (req, res) => {
+app.delete("/api/categories/:id", auth, async (req, res) => {
   const id = Number(req.params.id);
 
   try {
