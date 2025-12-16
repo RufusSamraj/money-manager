@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { eq, desc, and, gte, lt } from 'drizzle-orm';
+import { eq, desc, and, gte, lt, sql } from 'drizzle-orm';
 import * as schema from './db/schema';
 import nodemailer from "nodemailer"
 import bcrypt from "bcrypt"
@@ -233,6 +233,30 @@ app.post("/api/transactions", auth, async (req, res) => {
       })
       .returning();
 
+    if (type === "income") {
+        await db.update(schema.accounts)
+        .set({
+          balance: sql`${schema.accounts.balance} + ${Number(amount)}`,
+        })
+        .where(
+            and(
+              eq(schema.accounts.id, account),
+              eq(schema.accounts.userId, userId)
+            )
+          );
+    } else {
+      await db.update(schema.accounts)
+        .set({
+          balance: sql`${schema.accounts.balance} - ${Number(amount)}`,
+        })
+        .where(
+            and(
+              eq(schema.accounts.id, account),
+              eq(schema.accounts.userId, userId)
+            )
+          );
+    }
+
     res.json(result[0]);
   } catch (err) {
     console.error(err);
@@ -269,7 +293,32 @@ app.post("/api/transactions/bulk", auth, async (req, res) => {
         account: acc?.id || null,
         note: r.note || "",
       });
+      if (!acc) continue;
+      if (r.type === "income") {
+         await db.update(schema.accounts)
+         .set({
+           balance: sql`${schema.accounts.balance} + ${Number(r.amount)}`,
+         })
+         .where(
+             and(
+               eq(schema.accounts.id, r.acc.id),
+               eq(schema.accounts.userId, userId)
+             )
+           );
+     } else {
+       await db.update(schema.accounts)
+         .set({
+           balance: sql`${schema.accounts.balance} - ${Number(r.amount)}`,
+         })
+         .where(
+             and(
+               eq(schema.accounts.id, r.acc.id),
+               eq(schema.accounts.userId, userId)
+             )
+           );
+     }
     }
+
 
     res.json({ success: true });
 
