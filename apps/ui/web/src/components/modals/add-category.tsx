@@ -7,23 +7,49 @@ export function AddCategoryModal({ isOpen, onClose, onAdd }) {
   if (!isOpen) return null;
 
   return (
-    <div className="z-50 fixed inset-0 bg-black/40 flex items-center justify-center">
-      <div className="bg-white w-full max-w-sm rounded-xl shadow-xl">
-        <div className="flex justify-between p-4 border-b">
-          <h3 className="font-bold">New Category</h3>
-          <button onClick={onClose}><X size={18} /></button>
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+      <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              New Category
+            </h3>
+            <p className="text-xs text-gray-500">
+              Create a category to organize items
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition"
+          >
+            <X size={18} />
+          </button>
         </div>
 
-        <div className="p-4">
+        {/* Body */}
+        <div className="px-6 py-5 space-y-2">
+          <div className="text-md font-medium text-gray-500 mb-2">
+            Category name
+          </div>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg"
-            placeholder="Category name"
+            placeholder="Food, Rent, Travel"
+            autoFocus
+            className="
+              w-full px-3 py-2.5 rounded-xl
+              border border-gray-200
+              text-sm
+              focus:outline-none
+              focus:ring-2 focus:ring-gray-100
+            "
           />
         </div>
 
-        <div className="p-4 border-t">
+        {/* Footer */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
           <button
             onClick={() => {
               if (!name) return;
@@ -31,11 +57,18 @@ export function AddCategoryModal({ isOpen, onClose, onAdd }) {
               setName("");
               onClose();
             }}
-            className="w-full py-2 bg-gray-900 text-white rounded-lg"
+            className="
+              w-full py-2.5 rounded-xl
+              bg-gray-900 hover:bg-black
+              text-white font-medium
+              shadow-sm
+              transition-all active:scale-95
+            "
           >
-            Save
+            Save Category
           </button>
         </div>
+
       </div>
     </div>
   );
