@@ -14,6 +14,7 @@ import { RegisterPage } from "./pages/auth/register";
 import { VerifyOTPPage } from "./pages/auth/verify-otp";
 import { ProtectedRoute } from "./pages/protected";
 import { API_BASE_URL } from "./lib/constants";
+import { CategoriesPage } from "./pages/categories";
 
 function App() {
 
@@ -123,6 +124,7 @@ const isAuthPage = authRoutes.includes(location.pathname);
               <Route path="/" element={<ProtectedRoute><TransactionsPage /></ProtectedRoute>} />
               <Route path="/stats" element={<ProtectedRoute><StatsPage /></ProtectedRoute>} />
               <Route path="/accounts" element={<ProtectedRoute><AccountsPage /></ProtectedRoute>} />
+              <Route path="/categories" element={<ProtectedRoute><CategoriesPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             </Routes>
           </div>

@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { eq, desc, and, gte, lt, sql } from 'drizzle-orm';
+import { eq, desc, and, gte, lt, sql, asc } from 'drizzle-orm';
 import * as schema from './db/schema';
 import nodemailer from "nodemailer"
 import bcrypt from "bcrypt"
@@ -71,7 +71,7 @@ app.get("/api/account-groups", async (req, res) => {
 
 app.get("/api/categories", async (req, res) => {
   try {
-    const result = await db.select().from(schema.categories);
+    const result = await db.select().from(schema.categories).orderBy(asc(schema.categories.name));
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -79,6 +79,83 @@ app.get("/api/categories", async (req, res) => {
   }
 });
 
+app.post("/api/categories", async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: "Category name is required" });
+    }
+
+    const result = await db
+      .insert(schema.categories)
+      .values({ name })
+      .returning();
+
+    res.status(201).json(result[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to create category" });
+  }
+});
+
+app.put("/api/categories/:id", async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: "Category name is required" });
+    }
+
+    const result = await db
+      .update(schema.categories)
+      .set({ name })
+      .where(eq(schema.categories.id, id))
+      .returning();
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    res.json(result[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update category" });
+  }
+});
+app.delete("/api/categories/:id", async (req, res) => {
+  const id = Number(req.params.id);
+
+  try {
+    // check usage
+    const used = await db
+      .select({ id: schema.accounts.id })
+      .from(schema.accounts)
+      .where(eq(schema.accounts.id, id))
+      .limit(1);
+
+    if (used.length > 0) {
+      return res.status(409).json({
+        error: "Category is used by accounts",
+      });
+    }
+
+    const deleted = await db
+      .delete(schema.categories)
+      .where(eq(schema.categories.id, id))
+      .returning();
+
+    if (!deleted.length) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to delete category" });
+  }
+});
 app.get("/api/accounts", auth, async (req, res) => {
   try {
     const userId = req.user.id;

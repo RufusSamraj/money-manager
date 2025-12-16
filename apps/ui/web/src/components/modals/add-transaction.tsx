@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { EditIcon, X } from "lucide-react";
 import { API_BASE_URL } from "../../lib/constants";
+import { Link } from "react-router";
 
 export function AddTransactionModal({ isOpen, onClose, onAdd }) {
 
@@ -140,7 +141,7 @@ useEffect(() => {
           </div>
 
           <div className="space-y-2">
-             <label className="text-xs font-semibold text-gray-500">Category</label>
+             <label className="text-xs font-semibold text-gray-500 flex items-center justify-between">Category <div className="flex items-center justify-center cursor-pointer" onClick={() => window.location.href = '/categories'}><span  className="underline">edit</span>&nbsp;&nbsp;<EditIcon size={10} /></div></label>
              <div className="grid grid-cols-4 gap-2">
                {/* {Object.keys(COLORS.categoryColors).map(cat => (
                  <button
