@@ -12,6 +12,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import cookieParser from "cookie-parser";
 import { auth } from './middleware';
+import path from 'path';
 
 
 const transporter = nodemailer.createTransport({
@@ -27,6 +28,7 @@ const transporter = nodemailer.createTransport({
 const app = express();
 const port = 3000;
 
+
 // Middleware
 // app.use(cors()); // Allow frontend to connect
 app.use(cors({
@@ -41,6 +43,12 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+
+let distPath = path.join(__dirname, '..', '..', 'ui', 'web', 'dist');
+
+app.use(express.static(distPath));
+
+
 
 // Database Connection (Ensure you have a .env file with DATABASE_URL)
 const pool = new Pool({
@@ -330,6 +338,8 @@ app.post("/api/transactions/bulk", auth, async (req, res) => {
 
 
 
+
+
 // 1. Get All Transactions
 // app.get('/api/transactions', async (req, res) => {
 //   try {
@@ -515,7 +525,9 @@ app.post("/api/auth/logout", (req, res) => {
   return res.json({ success: true });
 });
 
-
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
+});
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
