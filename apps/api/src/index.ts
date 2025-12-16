@@ -13,6 +13,7 @@ import jwt from "jsonwebtoken"
 import cookieParser from "cookie-parser";
 import { auth } from './middleware';
 import path from 'path';
+import { DEFAULT_CATEGORIES } from './constants/defaultCategories';
 
 
 const transporter = nodemailer.createTransport({
@@ -57,6 +58,17 @@ const pool = new Pool({
 const db = drizzle(pool, { schema });
 // const db = drizzle({ client: pool });
 
+// --- SERVICES ---
+
+async function seedCategoriesForUser(userId: number) {
+  const values = DEFAULT_CATEGORIES.map((name) => ({
+    name,
+    userId,
+  }));
+
+  await db.insert(schema.categories).values(values);
+}
+
 // --- API Routes ---
 
 app.get("/api/account-groups", async (req, res) => {
@@ -71,7 +83,10 @@ app.get("/api/account-groups", async (req, res) => {
 
 app.get("/api/categories", async (req, res) => {
   try {
-    const result = await db.select().from(schema.categories).orderBy(asc(schema.categories.name));
+
+    const userId = req.user.id;
+
+    const result = await db.select().from(schema.categories).where(eq(schema.categories.userId, userId)).orderBy(asc(schema.categories.name));
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -82,6 +97,7 @@ app.get("/api/categories", async (req, res) => {
 app.post("/api/categories", async (req, res) => {
   try {
     const { name } = req.body;
+    const userId = req.user.id;
 
     if (!name) {
       return res.status(400).json({ error: "Category name is required" });
@@ -89,7 +105,7 @@ app.post("/api/categories", async (req, res) => {
 
     const result = await db
       .insert(schema.categories)
-      .values({ name })
+      .values({ name, userId })
       .returning();
 
     res.status(201).json(result[0]);
@@ -111,7 +127,9 @@ app.put("/api/categories/:id", async (req, res) => {
     const result = await db
       .update(schema.categories)
       .set({ name })
-      .where(eq(schema.categories.id, id))
+      .where(
+          eq(schema.categories.id, id)
+      )
       .returning();
 
     if (result.length === 0) {
@@ -534,13 +552,15 @@ app.post("/api/auth/verify", async (req, res) => {
     if (new Date() > saved.expiresAt) return res.status(400).json({ error: "OTP expired" });
 
     // mark user as verified
-    await db.update(schema.users)
+    const user = await db.update(schema.users)
       .set({ isVerified: true })
-      .where(eq(schema.users.email, email));
+      .where(eq(schema.users.email, email)).returning();
 
     // delete OTP entry
     await db.delete(schema.otps)
       .where(eq(schema.otps.email, email));
+
+    await seedCategoriesForUser(user[0].id);
 
     res.json({ success: true });
 

@@ -33,6 +33,7 @@ export const accounts = pgTable('accounts', {
 
 export const categories = pgTable('categories', {
   id: serial('id').primaryKey(),
+  userId: integer("user_id").notNull(),
   name: text('name').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 })
