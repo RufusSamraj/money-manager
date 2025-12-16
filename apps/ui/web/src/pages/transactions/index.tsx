@@ -3,6 +3,7 @@ import { Card } from "../../components/card";
 import { Badge } from "../../components/badge";
 import { MoneyText } from "../../components/money-text";
 import { ChevronLeft, ChevronRight, Filter, Search, Star, X } from "lucide-react";
+import { API_BASE_URL } from "../../lib/constants";
 
 export function TransactionsPage() {
 
@@ -14,7 +15,7 @@ export function TransactionsPage() {
     try {
 		
       const [txRes] = await Promise.all([
-        fetch("http://localhost:3000/api/transactions", {
+        fetch(`${API_BASE_URL}/transactions`, {
       credentials: 'include'}),
       ]);
 

@@ -13,6 +13,7 @@ import { LoginPage } from "./pages/auth/login";
 import { RegisterPage } from "./pages/auth/register";
 import { VerifyOTPPage } from "./pages/auth/verify-otp";
 import { ProtectedRoute } from "./pages/protected";
+import { API_BASE_URL } from "./lib/constants";
 
 function App() {
 
@@ -29,7 +30,7 @@ const isAuthPage = authRoutes.includes(location.pathname);
     try {
 		
       const [txRes] = await Promise.all([
-        fetch("http://localhost:3000/api/transactions", {
+        fetch(`${API_BASE_URL}/transactions`, {
       credentials: 'include'}),
       ]);
 
@@ -53,7 +54,7 @@ const isAuthPage = authRoutes.includes(location.pathname);
 
   
 	async function handleAddTransaction(data) {
-  await fetch("http://localhost:3000/api/transactions", {
+  await fetch(`${API_BASE_URL}/transactions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -61,7 +62,7 @@ const isAuthPage = authRoutes.includes(location.pathname);
       credentials: 'include',
   });
 
-  const updated = await fetch("http://localhost:3000/api/transactions", {
+  const updated = await fetch(`${API_BASE_URL}/transactions`, {
       credentials: 'include'})
     .then(res => res.json());
 
@@ -78,7 +79,7 @@ const isAuthPage = authRoutes.includes(location.pathname);
 //     body: JSON.stringify(data),
 //   });
 
-  const updated = await fetch("http://localhost:3000/api/transactions", {
+  const updated = await fetch(`${API_BASE_URL}/transactions`, {
       credentials: 'include'})
     .then(res => res.json());
 

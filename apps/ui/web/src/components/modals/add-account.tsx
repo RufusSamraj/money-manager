@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { COLORS } from "../../constants";
 import { X } from "lucide-react";
+import { API_BASE_URL } from "../../lib/constants";
 
 export function AddAccountModal({ isOpen, onClose, onAdd }) {
 
@@ -11,7 +12,7 @@ export function AddAccountModal({ isOpen, onClose, onAdd }) {
   const [description, setDescription] = useState('');
 
   useEffect(() => {
-  fetch("http://localhost:3000/api/account-groups", {
+  fetch(`${API_BASE_URL}/account-groups`, {
       credentials: 'include'})
     .then(res => res.json())
     .then(setGroups);

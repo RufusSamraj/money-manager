@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router";
+import { API_BASE_URL } from "../lib/constants";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [auth, setAuth] = useState<boolean | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/auth/me", {
+    fetch(`${API_BASE_URL}/auth/me`, {
       credentials: "include"
     })
       .then(res => {

@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { Card } from "../../components/card";
 import { AddAccountModal } from "../../components/modals/add-account";
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../lib/constants";
 
 export function AccountsPage() {
 
@@ -10,7 +11,7 @@ export function AccountsPage() {
   const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
-  fetch("http://localhost:3000/api/accounts", {credentials: "include"})
+  fetch(`${API_BASE_URL}/accounts`, {credentials: "include"})
     .then(res => res.json())
     .then(setAccounts);
 }, []);
@@ -58,7 +59,7 @@ const totals = computeTotals(accounts);
 
 
   async function handleAddAccount(data) {
-    await fetch("http://localhost:3000/api/accounts", {
+    await fetch(`${API_BASE_URL}/accounts`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: 'include',
@@ -69,7 +70,7 @@ const totals = computeTotals(accounts);
         group: data.groupId,  // will fix below
       }),
     });
-    await fetch("http://localhost:3000/api/accounts", {credentials: "include"})
+    await fetch(`${API_BASE_URL}/accounts`, {credentials: "include"})
     .then(res => res.json())
     .then(setAccounts);
 

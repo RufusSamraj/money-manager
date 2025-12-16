@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { API_BASE_URL } from "../../lib/constants";
 
 export function AddTransactionModal({ isOpen, onClose, onAdd }) {
 
@@ -17,14 +18,14 @@ const [accounts, setAccounts] = useState([]);
 
 useEffect(() => {
   // fetch categories
-  fetch("http://localhost:3000/api/categories", {
+  fetch(`${API_BASE_URL}/categories`, {
     credentials: "include",
   })
     .then(res => res.json())
     .then(setCategories);
 
   // fetch accounts and set default selection
-  fetch("http://localhost:3000/api/accounts", {
+  fetch(`${API_BASE_URL}/accounts`, {
     credentials: "include",
   })
     .then(res => res.json())

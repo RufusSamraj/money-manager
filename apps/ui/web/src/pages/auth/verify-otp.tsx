@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router";
 import { useState } from "react";
+import { API_BASE_URL } from "../../lib/constants";
 
 export function VerifyOTPPage() {
   const nav = useNavigate();
@@ -23,7 +24,7 @@ export function VerifyOTPPage() {
     setError("");
     setLoading(true);
 
-    const res = await fetch("http://localhost:3000/api/auth/verify", {
+    const res = await fetch(`${API_BASE_URL}/auth/verify`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

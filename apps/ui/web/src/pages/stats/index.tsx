@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "../../components/card";
 import { Badge } from "../../components/badge";
 import { COLORS } from "../../constants";
+import { API_BASE_URL } from "../../lib/constants";
 
 /**
  * Props:
@@ -25,9 +26,9 @@ export function StatsPage() {
     try {
 		
       const [txRes, catRes] = await Promise.all([
-        fetch("http://localhost:3000/api/transactions", {
+        fetch(`${API_BASE_URL}/transactions`, {
       credentials: 'include'}),
-        fetch("http://localhost:3000/api/categories", {
+        fetch(`${API_BASE_URL}/categories`, {
       credentials: 'include'})
       ]);
 

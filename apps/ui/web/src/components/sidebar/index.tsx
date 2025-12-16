@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router';
+import { API_BASE_URL } from '../../lib/constants';
 
 export function Sidebar({ isModalOpen, setIsModalOpen, excelModal, setExcelModal }) {
 
@@ -44,7 +45,7 @@ export function Sidebar({ isModalOpen, setIsModalOpen, excelModal, setExcelModal
   ];
 
   async function handleLogout() {
-    await fetch("http://localhost:3000/api/auth/logout", {
+    await fetch(`${API_BASE_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

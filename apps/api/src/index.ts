@@ -32,7 +32,7 @@ const port = 3000;
 // Middleware
 // app.use(cors()); // Allow frontend to connect
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:4173", "http://localhost:4200"],
+  origin: ["https://moneymanager.topoship.com", "http://moneymanager.topoship.com", "http://localhost:5173", "http://localhost:4173", "http://localhost:4200"],
   credentials: true,
 }));
 

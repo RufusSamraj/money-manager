@@ -2,6 +2,7 @@ import * as XLSX from "xlsx";
 
 import { X } from "lucide-react";
 import { useState } from "react";
+import { API_BASE_URL } from "../../lib/constants";
 
 export function UploadExcelModal({ isOpen, onClose, onAdd }) {
 
@@ -40,7 +41,7 @@ export function UploadExcelModal({ isOpen, onClose, onAdd }) {
     }));
 
     // Send to backend
-    await fetch("http://localhost:3000/api/transactions/bulk", {
+    await fetch(`${API_BASE_URL}/transactions/bulk`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed),
